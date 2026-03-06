@@ -1,6 +1,6 @@
 # ATS Resume Optimizer — 개발 진행사항
 
-> 마지막 업데이트: 2026-03-07
+> 마지막 업데이트: 2026-03-07 (Upstash 활성화)
 > 프로젝트 경로: `D:\coding\MP3_ResumeOptimizer`
 > GitHub: https://github.com/seungmin0501/ats-resume-optimizer
 > 프로덕션: https://ats-resume-optimizer-ten.vercel.app
@@ -141,14 +141,9 @@ optimized_resume text, created_at
   - 구독 취소 → `plan = 'free'` 복귀 확인
 
 ### 우선순위 중간
-- [ ] **Upstash Redis rate limiting 활성화** (코드 완성, env 변수만 추가하면 됨)
-  - Upstash Console → Redis DB 생성 (Region: ap-northeast-1 권장)
-  - `.env.local` + Vercel 환경변수에 추가:
-    ```
-    UPSTASH_REDIS_REST_URL=https://xxxxx.upstash.io
-    UPSTASH_REDIS_REST_TOKEN=AXxx...
-    ```
-  - 설정하면 자동으로 분당 10회 제한 적용
+- [x] **Upstash Redis rate limiting 활성화** ✅
+  - `.env.local` + Vercel 환경변수 추가 완료
+  - `/api/analyze` IP당 분당 10회 제한 적용 중
 
 ### 우선순위 낮음
 - [ ] **커스텀 도메인 연결** (도메인 구매 후 진행)
