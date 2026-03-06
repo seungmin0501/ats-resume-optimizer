@@ -1,60 +1,117 @@
 # ATS Resume Optimizer — 개발 진행사항
 
 > 마지막 업데이트: 2026-03-06
+> 프로젝트 경로: `D:\coding\MP3_ResumeOptimizer`
+> GitHub: https://github.com/seungmin0501/ats-resume-optimizer
+> 프로덕션: https://ats-resume-optimizer-ten.vercel.app
 
 ---
 
-## ✅ 완료된 작업 (Stages 1–5)
+## 프로젝트 개요
+
+- **제품**: AI SaaS — ATS(지원자 추적 시스템) 이력서 최적화
+- **스택**: Next.js 16 + TypeScript + Tailwind CSS + Supabase + LemonSqueezy + OpenAI GPT-4o
+- **플랜**: Free(3회/월), Pro($12/월 or $99/년, 무제한 + DOCX 다운로드)
+- **언어**: 한국어, English, 日本語, Español (next-intl)
+
+---
+
+## 로컬 개발 실행
+
+```bash
+cd D:\coding\MP3_ResumeOptimizer
+npm run dev        # http://localhost:3000
+npm run build      # 프로덕션 빌드 검증
+npm run test:e2e   # Playwright E2E (19개 테스트)
+```
+
+> GitHub push → Vercel 자동 재배포
+
+---
+
+## 핵심 아키텍처
+
+```
+app/
+  [locale]/               ← next-intl 라우팅 (en/ko/ja/es)
+    page.tsx              ← 랜딩 페이지
+    analyze/
+      page.tsx            ← 서버 컴포넌트 (유저 데이터 fetch)
+      AnalyzeClient.tsx   ← 클라이언트 UI (업로드, 결과, 모달)
+    dashboard/page.tsx    ← 분석 히스토리
+    pricing/page.tsx      ← 가격 페이지 (월간/연간 버튼)
+  api/
+    analyze/route.ts      ← PDF → GPT → DB 저장 (인증+크레딧 체크)
+    scrape/route.ts       ← 채용공고 URL 스크래핑
+    download/route.ts     ← DOCX 생성 (Pro 전용)
+    checkout/route.ts     ← LemonSqueezy checkout redirect
+    auth/google/          ← Google OAuth 시작
+    auth/callback/        ← OAuth 콜백 + users 테이블 upsert
+    auth/signout/         ← 로그아웃
+    webhooks/lemonsqueezy/← HMAC 검증 + plan 업데이트
+lib/
+  supabase.ts             ← lazy 클라이언트 + UserRow/AnalysisRow 타입
+  supabase-server.ts      ← SSR용 서버 클라이언트
+  openai.ts               ← GPT-4o 분석 래퍼
+  pdf.ts                  ← pdf-parse 래퍼 (5MB 제한)
+  scraper.ts              ← cheerio 스크래퍼 (SSRF 보호)
+  lemonsqueezy.ts         ← 웹훅 검증 + getCheckoutUrl()
+  ratelimit.ts            ← Upstash rate limiting (미설정 시 passthrough)
+proxy.ts                  ← next-intl 미들웨어 (Next.js 16은 middleware.ts 아님)
+```
+
+**주요 설계 결정:**
+- Next.js 16: `middleware.ts` → `proxy.ts` (next-intl 요구사항)
+- Supabase 클라이언트: 빌드타임 env 없음 → lazy 초기화
+- `analyses.section_feedback` → jsonb 컬럼 (텍스트 분리 컬럼 아님)
+- `users` 컬럼: `ls_customer_id`, `ls_subscription_id` (lemonsqueezy_ 접두사 아님)
+
+---
+
+## Supabase DB 스키마
+
+```sql
+-- users 테이블
+id uuid (= auth.users.id)
+email, plan('free'|'pro'), credits_used, credits_reset(date)
+ls_customer_id, ls_subscription_id
+created_at, updated_at (트리거 자동 업데이트)
+
+-- analyses 테이블
+id uuid, user_id, job_title, company_name
+match_score(0-100), grade('A'|'B'|'C'|'D')
+missing_keywords text[], section_feedback jsonb, format_warnings text[]
+optimized_resume text, created_at
+```
+
+---
+
+## 완료된 작업 (Stages 1–5)
 
 ### Stage 1: Core Engine ✅
-- `lib/openai.ts` — GPT-4o 분석 (JSON 응답 포맷, 30초 타임아웃, 5000자 트런케이션)
-- `lib/pdf.ts` — pdf-parse 래퍼 (5MB 제한)
-- `lib/scraper.ts` — cheerio URL 스크래퍼 (SSRF 보호)
-- `app/api/analyze/route.ts` — 메인 분석 API (인증 → 크레딧 → PDF → GPT → DB 저장)
-- `app/api/scrape/route.ts` — 채용공고 URL 스크래핑
-- `app/api/download/route.ts` — DOCX 생성 (Pro 전용)
+- GPT-4o 분석, PDF 파싱, URL 스크래핑, 분석/스크래핑/다운로드 API
 
 ### Stage 2: UI/UX ✅
-- `components/ScoreGauge.tsx` — SVG 원형 점수 게이지
-- `components/FeedbackCard.tsx` — 아코디언 섹션 피드백 (Pro 아닌 경우 blur)
-- `components/JobInput.tsx` — URL/텍스트 자동 감지 + 스크래핑
-- `components/UploadZone.tsx` — PDF 드래그&드롭 업로드
-- `components/LocaleSwitcher.tsx` — EN/한/日/ES 언어 전환
-- `app/[locale]/analyze/AnalyzeClient.tsx` — 메인 분석 UI (모달 포함)
+- ScoreGauge, FeedbackCard(blur), JobInput, UploadZone, LocaleSwitcher, AnalyzeClient
 
 ### Stage 3: 프로덕션 기반 ✅
-- i18n: 4개 언어 (en/ko/ja/es), 모든 UI 문자열 번역 완료
-- SEO: 페이지별 메타데이터, Landing 페이지 최적화
-- 보안 헤더: `next.config.ts` (X-Frame-Options, CSP, Referrer-Policy 등)
-- `vercel.json`: 배포 설정 + 함수 타임아웃 (analyze 60s, download 30s)
-- `supabase/schema.sql`: 전체 DB 스키마 (RLS 정책, 인덱스, 트리거)
-- `supabase/reset-credits.sql`: pg_cron 월별 크레딧 리셋
+- i18n 4개 언어, SEO 메타데이터, 보안 헤더, vercel.json, Supabase 스키마
 
 ### Stage 4: 인증 + 결제 ✅
-- Google OAuth via Supabase Auth
-- `app/api/auth/google/route.ts` — OAuth 시작
-- `app/api/auth/callback/route.ts` — 코드 교환 + 사용자 upsert
-- `app/api/auth/signout/route.ts` — 로그아웃
-- `app/api/webhooks/lemonsqueezy/route.ts` — HMAC 서명 검증 + 구독 상태 업데이트
-- `app/api/checkout/route.ts` — 월간/연간 variant 분기 checkout redirect
-- 크레딧 시스템: 무료 3회/월, 소진 시 업그레이드 모달
+- Google OAuth, LemonSqueezy 웹훅, checkout API(월간/연간), 크레딧 시스템
 
 ### Stage 5: QA + Launch ✅
-- generateStaticParams (모든 locale 페이지)
-- Rate limiting (`lib/ratelimit.ts`, Upstash graceful fallback)
-- ErrorBoundary (`components/ErrorBoundary.tsx`)
 - Playwright E2E 19/19 통과
 - Supabase schema.sql + reset-credits.sql 실행 완료
-- LemonSqueezy 제품(월간/연간) 생성 + 웹훅 등록 완료
-- Vercel 배포 완료: https://ats-resume-optimizer-ten.vercel.app
-- Google OAuth redirect URI 업데이트 완료
+- LemonSqueezy 제품(월간 $12 / 연간 $99) 생성 + 웹훅 등록 완료
+- Vercel 배포 + Google OAuth redirect URI 업데이트 완료
 
 ---
 
-## 환경 변수 체크리스트
+## 환경 변수 현황
 
-| 변수 | 로컬 | Vercel | 비고 |
-|------|------|--------|------|
+| 변수 | 로컬 `.env.local` | Vercel | 비고 |
+|------|:-----------------:|:------:|------|
 | `OPENAI_API_KEY` | ✅ | ✅ | |
 | `NEXT_PUBLIC_SUPABASE_URL` | ✅ | ✅ | |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | ✅ | ✅ | |
@@ -64,37 +121,46 @@
 | `LEMONSQUEEZY_STORE_ID` | ✅ | ✅ | |
 | `LEMONSQUEEZY_PRO_VARIANT_MONTHLY` | ✅ | ✅ | |
 | `LEMONSQUEEZY_PRO_VARIANT_YEARLY` | ✅ | ✅ | |
-| `UPSTASH_REDIS_REST_URL` | ⬜ | ⬜ | 선택적 (rate limiting) |
-| `UPSTASH_REDIS_REST_TOKEN` | ⬜ | ⬜ | 선택적 (rate limiting) |
+| `UPSTASH_REDIS_REST_URL` | ⬜ | ⬜ | 선택적 — 미설정 시 rate limit 없이 동작 |
+| `UPSTASH_REDIS_REST_TOKEN` | ⬜ | ⬜ | 선택적 |
 
 ---
 
-## 주요 URL 구조
+## 남은 작업 (선택적)
+
+### 우선순위 높음
+- [ ] **결제 플로우 실제 테스트**
+  - LemonSqueezy test mode에서 구독 생성
+  - 웹훅 수신 확인 → Supabase `users.plan = 'pro'` 변경되는지 확인
+  - Pro 유저로 DOCX 다운로드 동작 확인
+  - 구독 취소 → `plan = 'free'` 복귀 확인
+
+### 우선순위 중간
+- [ ] **Upstash Redis rate limiting 활성화**
+  - Upstash 계정 → Redis DB 생성
+  - `.env.local` + Vercel 환경변수에 추가:
+    ```
+    UPSTASH_REDIS_REST_URL=
+    UPSTASH_REDIS_REST_TOKEN=
+    ```
+  - 설정하면 자동으로 분당 10회 제한 적용
+
+### 우선순위 낮음
+- [ ] **커스텀 도메인 연결**
+  - Vercel Dashboard → 프로젝트 → Settings → Domains
+  - 도메인 추가 후 Supabase + Google Cloud Console redirect URI도 도메인으로 업데이트 필요
+
+---
+
+## 주요 URL
 
 ```
-https://ats-resume-optimizer-ten.vercel.app
+프로덕션: https://ats-resume-optimizer-ten.vercel.app
 
-/              → /en (기본 로케일, SEO 최적화)
-/ko, /ja, /es  → 각 언어 랜딩 페이지
 /[locale]/analyze    → 메인 분석 페이지
 /[locale]/dashboard  → 분석 히스토리
-/[locale]/pricing    → 가격 정책 (월간/연간 checkout 버튼)
-/[locale]/privacy    → 개인정보 처리방침
-/[locale]/terms      → 이용약관
+/[locale]/pricing    → 가격 (월간/연간 버튼 → /api/checkout?plan=monthly|yearly)
 /api/analyze         → POST: 이력서 분석
-/api/scrape          → POST: 채용공고 URL 스크래핑
-/api/download        → POST: DOCX 생성 (Pro)
-/api/checkout        → GET: LemonSqueezy checkout redirect (?plan=monthly|yearly)
-/api/auth/google     → Google OAuth 시작
-/api/auth/callback   → OAuth 콜백
-/api/auth/signout    → 로그아웃
-/api/webhooks/lemonsqueezy → LemonSqueezy 웹훅
+/api/checkout        → GET: LemonSqueezy checkout redirect
+/api/webhooks/lemonsqueezy → LemonSqueezy 웹훅 수신
 ```
-
----
-
-## 남은 선택적 작업
-
-- [ ] Upstash Redis 설정 (rate limiting 활성화, 현재 제한 없이 동작 중)
-- [ ] 커스텀 도메인 연결 (현재 vercel.app 도메인 사용 중)
-- [ ] LemonSqueezy 웹훅 실제 결제 테스트 (test mode로 구독 생성 → DB plan 업데이트 확인)
