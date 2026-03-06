@@ -1,6 +1,6 @@
 # ATS Resume Optimizer — 개발 진행사항
 
-> 마지막 업데이트: 2026-03-06
+> 마지막 업데이트: 2026-03-07
 > 프로젝트 경로: `D:\coding\MP3_ResumeOptimizer`
 > GitHub: https://github.com/seungmin0501/ats-resume-optimizer
 > 프로덕션: https://ats-resume-optimizer-ten.vercel.app
@@ -106,6 +106,11 @@ optimized_resume text, created_at
 - LemonSqueezy 제품(월간 $12 / 연간 $99) 생성 + 웹훅 등록 완료
 - Vercel 배포 + Google OAuth redirect URI 업데이트 완료
 
+### Stage 6: 결제 플로우 코드 점검 + 버그 수정 ✅
+- `lib/lemonsqueezy.ts`: `verifyWebhookSignature` try-catch 추가 (timingSafeEqual 길이 불일치 시 500 → 401 정상 처리)
+- `app/[locale]/pricing/page.tsx`: async params + `getTranslations` 마이그레이션 (Next.js 16 호환)
+- `app/api/analyze/route.ts`: 첫 스캔 시 `credits_reset` 자동 설정 (null 표시 버그 수정)
+
 ---
 
 ## 환경 변수 현황
@@ -136,19 +141,21 @@ optimized_resume text, created_at
   - 구독 취소 → `plan = 'free'` 복귀 확인
 
 ### 우선순위 중간
-- [ ] **Upstash Redis rate limiting 활성화**
-  - Upstash 계정 → Redis DB 생성
+- [ ] **Upstash Redis rate limiting 활성화** (코드 완성, env 변수만 추가하면 됨)
+  - Upstash Console → Redis DB 생성 (Region: ap-northeast-1 권장)
   - `.env.local` + Vercel 환경변수에 추가:
     ```
-    UPSTASH_REDIS_REST_URL=
-    UPSTASH_REDIS_REST_TOKEN=
+    UPSTASH_REDIS_REST_URL=https://xxxxx.upstash.io
+    UPSTASH_REDIS_REST_TOKEN=AXxx...
     ```
   - 설정하면 자동으로 분당 10회 제한 적용
 
 ### 우선순위 낮음
-- [ ] **커스텀 도메인 연결**
-  - Vercel Dashboard → 프로젝트 → Settings → Domains
-  - 도메인 추가 후 Supabase + Google Cloud Console redirect URI도 도메인으로 업데이트 필요
+- [ ] **커스텀 도메인 연결** (도메인 구매 후 진행)
+  - Vercel Dashboard → 프로젝트 → Settings → Domains → Add Domain
+  - DNS: A 레코드 `@` → `76.76.21.21` (루트) 또는 CNAME `www` → `cname.vercel-dns.com`
+  - Supabase → Authentication → URL Configuration → Site URL + Redirect URLs 업데이트
+  - Google Cloud Console → OAuth 2.0 Client → Authorized redirect URIs 업데이트
 
 ---
 
