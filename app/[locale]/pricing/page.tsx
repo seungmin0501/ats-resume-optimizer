@@ -109,12 +109,20 @@ export default function PricingPage({
                 </li>
               ))}
             </ul>
-            <a
-              href="/api/checkout"
-              className="block text-center bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3 font-semibold transition-colors"
-            >
-              {t("cta_pro")}
-            </a>
+            <div className="flex flex-col gap-2">
+              <a
+                href="/api/checkout?plan=monthly"
+                className="block text-center bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3 font-semibold transition-colors"
+              >
+                {t("cta_pro")}
+              </a>
+              <a
+                href="/api/checkout?plan=yearly"
+                className="block text-center border border-blue-600 text-blue-600 hover:bg-blue-50 rounded-xl py-2.5 text-sm font-semibold transition-colors"
+              >
+                {t("cta_pro_yearly")}
+              </a>
+            </div>
           </div>
         </div>
 

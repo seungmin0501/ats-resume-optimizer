@@ -13,7 +13,12 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(new URL("/analyze", req.url));
   }
 
-  const variantId = process.env.LEMONSQUEEZY_PRO_VARIANT_ID;
+  const plan = req.nextUrl.searchParams.get("plan");
+  const variantId =
+    plan === "yearly"
+      ? process.env.LEMONSQUEEZY_PRO_VARIANT_YEARLY
+      : process.env.LEMONSQUEEZY_PRO_VARIANT_MONTHLY;
+
   if (!variantId) {
     return NextResponse.json({ error: "CHECKOUT_NOT_CONFIGURED" }, { status: 503 });
   }
