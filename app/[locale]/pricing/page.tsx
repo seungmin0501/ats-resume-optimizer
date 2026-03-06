@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { useTranslations } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import LocaleSwitcher from "@/components/LocaleSwitcher";
 import { routing } from "@/i18n/routing";
@@ -31,14 +30,15 @@ function XIcon() {
   );
 }
 
-export default function PricingPage({
+export default async function PricingPage({
   params,
 }: {
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
-  setRequestLocale(params.locale);
-  const t = useTranslations("pricing");
-  const tNav = useTranslations("nav");
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations("pricing");
+  const tNav = await getTranslations("nav");
 
   return (
     <div className="min-h-screen bg-gray-50">

@@ -146,9 +146,16 @@ export async function POST(req: NextRequest) {
 
     // 7. 크레딧 차감 (무료 사용자)
     if (!isPro) {
+      const now = new Date();
+      const firstOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1)
+        .toISOString()
+        .split("T")[0];
       await serviceClient
         .from("users")
-        .update({ credits_used: currentUser.credits_used + 1 })
+        .update({
+          credits_used: currentUser.credits_used + 1,
+          ...(currentUser.credits_reset === null ? { credits_reset: firstOfNextMonth } : {}),
+        })
         .eq("id", user.id);
     }
 

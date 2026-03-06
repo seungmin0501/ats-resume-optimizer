@@ -4,13 +4,17 @@ export function verifyWebhookSignature(
   payload: string,
   signature: string
 ): boolean {
-  const secret = process.env.LEMONSQUEEZY_WEBHOOK_SECRET!;
-  const hmac = crypto.createHmac("sha256", secret);
-  const digest = hmac.update(payload).digest("hex");
-  return crypto.timingSafeEqual(
-    Buffer.from(digest, "hex"),
-    Buffer.from(signature, "hex")
-  );
+  try {
+    const secret = process.env.LEMONSQUEEZY_WEBHOOK_SECRET!;
+    const hmac = crypto.createHmac("sha256", secret);
+    const digest = hmac.update(payload).digest("hex");
+    return crypto.timingSafeEqual(
+      Buffer.from(digest, "hex"),
+      Buffer.from(signature, "hex")
+    );
+  } catch {
+    return false;
+  }
 }
 
 export async function getCheckoutUrl(
