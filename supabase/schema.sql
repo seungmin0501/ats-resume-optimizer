@@ -1,15 +1,15 @@
--- ATS Resume Optimizer — Supabase Schema
--- Run this in Supabase SQL Editor to initialize the database
+-- ATS Resume Optimizer — Supabase Schema (v2: one-time credit pack model)
+-- Run this in Supabase SQL Editor for a fresh install
 
 -- Users table (synced from Supabase Auth on first login)
 create table if not exists public.users (
   id uuid primary key references auth.users(id) on delete cascade,
   email text not null,
-  plan text not null default 'free' check (plan in ('free', 'pro')),
-  credits_used integer not null default 0,
-  credits_reset date not null default (date_trunc('month', now()) + interval '1 month')::date,
+  plan_tier text not null default 'free' check (plan_tier in ('free', 'basic', 'pro', 'unlimited')),
+  credits_remaining integer not null default 1,
+  unlimited_expires_at timestamptz,
   ls_customer_id text,
-  ls_subscription_id text,
+  ls_order_id text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -26,6 +26,9 @@ create table if not exists public.analyses (
   section_feedback jsonb,
   format_warnings text[] default '{}',
   optimized_resume text,
+  cover_letter text,
+  interview_prep jsonb,
+  target_language text not null default 'en',
   created_at timestamptz not null default now()
 );
 

@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { getCheckoutUrl } from "@/lib/lemonsqueezy";
 
+const PLAN_VARIANT: Record<string, string | undefined> = {
+  basic: process.env.LEMONSQUEEZY_BASIC_VARIANT_ID,
+  pro: process.env.LEMONSQUEEZY_PRO_VARIANT_ID,
+  unlimited: process.env.LEMONSQUEEZY_UNLIMITED_VARIANT_ID,
+};
+
 export async function GET(req: NextRequest) {
   const supabase = await createServerSupabaseClient();
   const {
@@ -9,15 +15,11 @@ export async function GET(req: NextRequest) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    // 미인증 → analyze 페이지로 (로그인 모달)
     return NextResponse.redirect(new URL("/analyze", req.url));
   }
 
-  const plan = req.nextUrl.searchParams.get("plan");
-  const variantId =
-    plan === "yearly"
-      ? process.env.LEMONSQUEEZY_PRO_VARIANT_YEARLY
-      : process.env.LEMONSQUEEZY_PRO_VARIANT_MONTHLY;
+  const plan = req.nextUrl.searchParams.get("plan") ?? "";
+  const variantId = PLAN_VARIANT[plan];
 
   if (!variantId) {
     return NextResponse.json({ error: "CHECKOUT_NOT_CONFIGURED" }, { status: 503 });

@@ -9,6 +9,7 @@ const localeLabels: Record<string, string> = {
   ko: "한",
   ja: "日",
   es: "ES",
+  "zh-CN": "中",
 };
 
 export default function LocaleSwitcher() {

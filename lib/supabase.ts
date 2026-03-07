@@ -1,13 +1,15 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
+export type PlanTier = "free" | "basic" | "pro" | "unlimited";
+
 export type UserRow = {
   id: string;
   email: string;
-  plan: "free" | "pro";
-  credits_used: number;
-  credits_reset: string | null;
+  plan_tier: PlanTier;
+  credits_remaining: number;
+  unlimited_expires_at: string | null;
   ls_customer_id: string | null;
-  ls_subscription_id: string | null;
+  ls_order_id: string | null;
   created_at: string;
 };
 
@@ -26,6 +28,15 @@ export type AnalysisRow = {
   };
   format_warnings: string[];
   optimized_resume: string | null;
+  cover_letter: string | null;
+  interview_prep: {
+    questions: Array<{
+      question: string;
+      model_answer: string;
+      keywords: string[];
+    }>;
+  } | null;
+  target_language: string;
   created_at: string;
 };
 

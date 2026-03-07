@@ -8,22 +8,25 @@ import UploadZone from "@/components/UploadZone";
 import ScoreGauge from "@/components/ScoreGauge";
 import KeywordList from "@/components/KeywordList";
 import FeedbackCard from "@/components/FeedbackCard";
+import CoverLetter from "@/components/CoverLetter";
+import InterviewPrep from "@/components/InterviewPrep";
 import LocaleSwitcher from "@/components/LocaleSwitcher";
 import type { AnalysisResult } from "@/lib/openai";
 
+type PlanTier = "free" | "basic" | "pro" | "unlimited";
+
 type UserData = {
   email: string;
-  plan: "free" | "pro";
-  creditsUsed: number;
-  creditsReset: string | null;
+  planTier: PlanTier;
+  creditsRemaining: number;
+  unlimitedExpiresAt: string | null;
   name: string | null;
   avatarUrl: string | null;
 } | null;
 
-type AnalysisResponse = AnalysisResult & {
-  analysis_id?: string;
-  error?: string;
-};
+type AnalysisResponse = AnalysisResult & { analysis_id?: string };
+
+type UpgradeTarget = "basic" | "pro" | null;
 
 type Props = { user: UserData };
 
@@ -40,13 +43,33 @@ function SkeletonCard() {
 
 function Modal({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={onClose}>
-      <div className="bg-white rounded-2xl p-8 max-w-sm w-full shadow-xl" onClick={(e) => e.stopPropagation()}>
+    <div
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-2xl p-8 max-w-sm w-full shadow-xl"
+        onClick={(e) => e.stopPropagation()}
+      >
         {children}
       </div>
     </div>
   );
 }
+
+const PLAN_LABELS: Record<PlanTier, string> = {
+  free: "Free",
+  basic: "Basic",
+  pro: "Pro",
+  unlimited: "Unlimited",
+};
+
+const PLAN_COLORS: Record<PlanTier, string> = {
+  free: "text-gray-500 bg-gray-100",
+  basic: "text-green-700 bg-green-50",
+  pro: "text-blue-700 bg-blue-50",
+  unlimited: "text-purple-700 bg-purple-50",
+};
 
 export default function AnalyzeClient({ user }: Props) {
   const t = useTranslations("analyze");
@@ -63,15 +86,27 @@ export default function AnalyzeClient({ user }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showCreditModal, setShowCreditModal] = useState(false);
-  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [upgradeTarget, setUpgradeTarget] = useState<UpgradeTarget>(null);
 
   const canAnalyze = jobText.trim().length > 0 && resumeFile !== null;
-  const isPro = user?.plan === "pro";
+
+  const planTier = user?.planTier ?? "free";
+  const isBasicOrAbove = planTier === "basic" || planTier === "pro" || planTier === "unlimited";
+  const isProOrAbove = planTier === "pro" || planTier === "unlimited";
+
+  const isUnlimitedActive =
+    planTier === "unlimited" &&
+    user?.unlimitedExpiresAt != null &&
+    new Date(user.unlimitedExpiresAt) > new Date();
+
+  const hasCredits =
+    isUnlimitedActive ||
+    (planTier !== "unlimited" && (user?.creditsRemaining ?? 0) > 0);
 
   const handleAnalyze = useCallback(async () => {
     if (!canAnalyze) return;
     if (!user) { setShowLoginModal(true); return; }
-    if (!isPro && (user.creditsUsed ?? 0) >= 3) { setShowCreditModal(true); return; }
+    if (!hasCredits) { setShowCreditModal(true); return; }
 
     setAnalyzing(true);
     setError(null);
@@ -97,11 +132,11 @@ export default function AnalyzeClient({ user }: Props) {
     } finally {
       setAnalyzing(false);
     }
-  }, [canAnalyze, user, isPro, jobText, resumeFile, tErrors]);
+  }, [canAnalyze, user, hasCredits, jobText, resumeFile, tErrors]);
 
   const handleDownload = useCallback(async () => {
     if (!result?.analysis_id) return;
-    if (!isPro) { setShowUpgradeModal(true); return; }
+    if (!isBasicOrAbove) { setUpgradeTarget("basic"); return; }
 
     const res = await fetch("/api/download", {
       method: "POST",
@@ -117,7 +152,11 @@ export default function AnalyzeClient({ user }: Props) {
     a.download = "optimized-resume.docx";
     a.click();
     URL.revokeObjectURL(url);
-  }, [result, isPro]);
+  }, [result, isBasicOrAbove]);
+
+  const creditsDisplay = isUnlimitedActive
+    ? null
+    : (user?.creditsRemaining ?? 0);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -129,16 +168,17 @@ export default function AnalyzeClient({ user }: Props) {
             <LocaleSwitcher />
             {user ? (
               <>
-                {!isPro && (
+                {creditsDisplay !== null && (
                   <span className="text-sm text-gray-500 hidden sm:block">
-                    {tNav("credits_remaining", { count: Math.max(0, 3 - (user.creditsUsed || 0)) })}
+                    {tNav("credits_remaining", { count: creditsDisplay })}
                   </span>
                 )}
-                {isPro && (
-                  <span className="text-sm font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">Pro</span>
-                )}
-                <Link href="/dashboard" className="text-sm text-gray-700 hover:text-gray-900 hidden sm:block">{tNav("dashboard")}</Link>
-                {/* 프로필 + 로그아웃 */}
+                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full hidden sm:block ${PLAN_COLORS[planTier]}`}>
+                  {PLAN_LABELS[planTier]}
+                </span>
+                <Link href="/dashboard" className="text-sm text-gray-700 hover:text-gray-900 hidden sm:block">
+                  {tNav("dashboard")}
+                </Link>
                 <div className="flex items-center gap-2">
                   {user.avatarUrl ? (
                     <img
@@ -227,7 +267,18 @@ export default function AnalyzeClient({ user }: Props) {
                 )}
                 {result.section_feedback && (
                   <div className="fade-in-up fade-in-up-delay-3">
-                    <FeedbackCard feedback={result.section_feedback} isPro={isPro} />
+                    <FeedbackCard
+                      feedback={result.section_feedback}
+                      isBasicOrAbove={isBasicOrAbove}
+                    />
+                    {!isBasicOrAbove && (
+                      <button
+                        onClick={() => setUpgradeTarget("basic")}
+                        className="mt-2 w-full text-center text-sm text-blue-600 font-medium hover:text-blue-700"
+                      >
+                        {tResults("blur_cta_basic")} →
+                      </button>
+                    )}
                   </div>
                 )}
                 {result.format_warnings?.length > 0 && (
@@ -244,7 +295,7 @@ export default function AnalyzeClient({ user }: Props) {
                 )}
                 <div className="fade-in-up fade-in-up-delay-5 rounded-xl border border-gray-200 bg-white p-6">
                   <h3 className="text-sm font-medium text-gray-500 mb-3">{tResults("optimized_resume_title")}</h3>
-                  {isPro && result.optimized_resume ? (
+                  {isBasicOrAbove && result.optimized_resume ? (
                     <button
                       onClick={handleDownload}
                       className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg py-3 font-semibold transition-colors flex items-center justify-center gap-2"
@@ -256,12 +307,26 @@ export default function AnalyzeClient({ user }: Props) {
                     </button>
                   ) : (
                     <button
-                      onClick={() => setShowUpgradeModal(true)}
+                      onClick={() => setUpgradeTarget("basic")}
                       className="w-full border border-blue-600 text-blue-600 hover:bg-blue-50 rounded-lg py-3 font-semibold transition-colors"
                     >
                       🔒 {tResults("upgrade_to_unlock")}
                     </button>
                   )}
+                </div>
+                <div className="fade-in-up">
+                  <CoverLetter
+                    content={result.cover_letter ?? null}
+                    isProOrAbove={isProOrAbove}
+                    onUpgradeClick={() => setUpgradeTarget("pro")}
+                  />
+                </div>
+                <div className="fade-in-up">
+                  <InterviewPrep
+                    data={result.interview_prep ?? null}
+                    isProOrAbove={isProOrAbove}
+                    onUpgradeClick={() => setUpgradeTarget("pro")}
+                  />
                 </div>
               </div>
             ) : (
@@ -298,7 +363,7 @@ export default function AnalyzeClient({ user }: Props) {
         </Modal>
       )}
 
-      {/* Credit Modal */}
+      {/* No Credits Modal */}
       {showCreditModal && (
         <Modal onClose={() => setShowCreditModal(false)}>
           <div className="text-center">
@@ -306,32 +371,61 @@ export default function AnalyzeClient({ user }: Props) {
             <h2 className="text-xl font-bold text-gray-900 mb-2">{tCredits("no_credits_title")}</h2>
             <p className="text-gray-500 text-sm mb-6">{tCredits("no_credits_desc")}</p>
             <div className="space-y-3">
-              <Link href="/pricing" className="block w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg py-3 font-semibold text-center">
-                {tResults("upgrade_to_pro_cta")}
+              <Link
+                href="/pricing"
+                className="flex items-center justify-between w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-3 font-semibold"
+                onClick={() => setShowCreditModal(false)}
+              >
+                <span>Basic</span><span>$5 · 3 scans</span>
               </Link>
-              <button onClick={() => setShowCreditModal(false)} className="block w-full text-gray-500 text-sm hover:text-gray-700">
-                {t("wait_next_month")}
-              </button>
+              <Link
+                href="/pricing"
+                className="flex items-center justify-between w-full bg-blue-700 hover:bg-blue-800 text-white rounded-lg px-4 py-3 font-semibold"
+                onClick={() => setShowCreditModal(false)}
+              >
+                <span>Pro</span><span>$15 · 10 scans</span>
+              </Link>
+              <Link
+                href="/pricing"
+                className="flex items-center justify-between w-full border border-blue-600 text-blue-600 hover:bg-blue-50 rounded-lg px-4 py-3 font-semibold"
+                onClick={() => setShowCreditModal(false)}
+              >
+                <span>Unlimited</span><span>$29 · 90 days</span>
+              </Link>
             </div>
-            {user?.creditsReset && (
-              <p className="mt-4 text-xs text-gray-400">
-                {tCredits("resets_on", { date: new Date(user.creditsReset).toLocaleDateString() })}
-              </p>
-            )}
           </div>
         </Modal>
       )}
 
-      {/* Upgrade Modal */}
-      {showUpgradeModal && (
-        <Modal onClose={() => setShowUpgradeModal(false)}>
+      {/* Upgrade Modal (feature-specific) */}
+      {upgradeTarget && (
+        <Modal onClose={() => setUpgradeTarget(null)}>
           <div className="text-center">
-            <div className="text-4xl mb-4">🚀</div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">{tResults("upgrade_modal_title")}</h2>
-            <p className="text-gray-500 text-sm mb-6">{tResults("upgrade_modal_desc")}</p>
-            <Link href="/pricing" className="block w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg py-3 font-semibold text-center">
-              {tDash("upgrade_cta")}
+            <div className="text-4xl mb-4">🔒</div>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">
+              {upgradeTarget === "basic"
+                ? tResults("upgrade_modal_basic_title")
+                : tResults("upgrade_modal_pro_title")}
+            </h2>
+            <p className="text-gray-500 text-sm mb-6">
+              {upgradeTarget === "basic"
+                ? tResults("upgrade_modal_basic_desc")
+                : tResults("upgrade_modal_pro_desc")}
+            </p>
+            <Link
+              href={`/api/checkout?plan=${upgradeTarget}`}
+              className="block w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg py-3 font-semibold text-center"
+            >
+              {upgradeTarget === "basic"
+                ? tResults("upgrade_to_pro_cta")
+                : tResults("upgrade_to_pro_cta_pro")}
             </Link>
+            <button
+              onClick={() => setUpgradeTarget(null)}
+              className="mt-3 block w-full text-gray-400 text-sm hover:text-gray-600"
+            >
+              {tDash("new_analysis")}
+            </button>
           </div>
         </Modal>
       )}

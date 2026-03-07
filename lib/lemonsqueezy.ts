@@ -1,4 +1,19 @@
 import crypto from "crypto";
+import type { PlanTier } from "./supabase";
+
+type PlanConfig = {
+  credits: number;
+  tier: PlanTier;
+  days?: number;
+};
+
+export function getPlanMap(): Record<string, PlanConfig> {
+  return {
+    [process.env.LEMONSQUEEZY_BASIC_VARIANT_ID!]: { credits: 3, tier: "basic" },
+    [process.env.LEMONSQUEEZY_PRO_VARIANT_ID!]: { credits: 10, tier: "pro" },
+    [process.env.LEMONSQUEEZY_UNLIMITED_VARIANT_ID!]: { credits: 999, tier: "unlimited", days: 90 },
+  };
+}
 
 export function verifyWebhookSignature(
   payload: string,

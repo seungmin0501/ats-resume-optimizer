@@ -6,9 +6,24 @@ import { redirect } from "next/navigation";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { createServiceClient } from "@/lib/supabase";
 import LocaleSwitcher from "@/components/LocaleSwitcher";
+import type { PlanTier } from "@/lib/supabase";
 
 export const metadata: Metadata = {
   title: "Dashboard — ATS Resume Optimizer",
+};
+
+const PLAN_LABELS: Record<PlanTier, string> = {
+  free: "Free",
+  basic: "Basic",
+  pro: "Pro",
+  unlimited: "Unlimited",
+};
+
+const PLAN_COLORS: Record<PlanTier, string> = {
+  free: "text-gray-500 bg-gray-100",
+  basic: "text-green-700 bg-green-50",
+  pro: "text-blue-700 bg-blue-50",
+  unlimited: "text-purple-700 bg-purple-50",
 };
 
 function ScoreBadge({ score }: { score: number }) {
@@ -33,25 +48,31 @@ type AnalysisItem = {
 };
 
 type UserData = {
-  plan: "free" | "pro";
-  credits_used: number;
-  credits_reset: string | null;
+  plan_tier: PlanTier;
+  credits_remaining: number;
+  unlimited_expires_at: string | null;
   email: string;
 };
 
 function DashboardView({
   user,
   analyses,
-  isPro,
-  creditsRemaining,
 }: {
   user: UserData | null;
   analyses: AnalysisItem[];
-  isPro: boolean;
-  creditsRemaining: number | null;
 }) {
   const t = useTranslations("dashboard");
   const tNav = useTranslations("nav");
+
+  const planTier = user?.plan_tier ?? "free";
+  const isUnlimited = planTier === "unlimited";
+  const isUnlimitedActive =
+    isUnlimited &&
+    user?.unlimited_expires_at != null &&
+    new Date(user.unlimited_expires_at) > new Date();
+
+  const showCredits = !isUnlimitedActive;
+  const showGetMore = planTier === "free" || planTier === "basic";
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -60,9 +81,9 @@ function DashboardView({
           <Link href="/" className="font-bold text-lg text-blue-600">{tNav("logo")}</Link>
           <div className="flex items-center gap-4">
             <LocaleSwitcher />
-            {isPro && (
-              <span className="text-sm font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">Pro</span>
-            )}
+            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${PLAN_COLORS[planTier]}`}>
+              {PLAN_LABELS[planTier]}
+            </span>
             <Link href="/analyze" className="text-sm text-gray-700 hover:text-gray-900">{t("new_analysis")}</Link>
             <form action="/api/auth/signout" method="POST">
               <button type="submit" className="text-sm text-gray-500 hover:text-gray-700">{tNav("logout")}</button>
@@ -75,35 +96,47 @@ function DashboardView({
         <h1 className="text-2xl font-bold text-gray-900 mb-8">{t("title")}</h1>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
+          {/* 플랜 */}
           <div className="rounded-xl border border-gray-200 bg-white p-6">
             <p className="text-xs text-gray-500 mb-1">{t("plan_label")}</p>
-            <p className="text-xl font-bold text-gray-900 capitalize">{user?.plan || "Free"}</p>
+            <p className={`text-xl font-bold ${PLAN_COLORS[planTier].split(" ")[0]}`}>
+              {PLAN_LABELS[planTier]}
+            </p>
           </div>
-          {!isPro && (
+
+          {/* 잔여 크레딧 또는 만료일 */}
+          {showCredits ? (
             <div className="rounded-xl border border-gray-200 bg-white p-6">
               <p className="text-xs text-gray-500 mb-1">{t("credits_label")}</p>
-              <p className="text-xl font-bold text-gray-900">{creditsRemaining} / 3</p>
+              <p className="text-xl font-bold text-gray-900">{user?.credits_remaining ?? 0}</p>
             </div>
-          )}
-          {!isPro && user?.credits_reset && (
+          ) : (
             <div className="rounded-xl border border-gray-200 bg-white p-6">
-              <p className="text-xs text-gray-500 mb-1">{t("resets_label")}</p>
+              <p className="text-xs text-gray-500 mb-1">{t("expires_label")}</p>
               <p className="text-xl font-bold text-gray-900">
-                {new Date(user.credits_reset).toLocaleDateString()}
+                {user?.unlimited_expires_at
+                  ? new Date(user.unlimited_expires_at).toLocaleDateString()
+                  : "—"}
               </p>
             </div>
           )}
-          {!isPro && (
+
+          {/* 크레딧 추가 CTA (free/basic만) */}
+          {showGetMore && (
             <div className="rounded-xl border border-blue-200 bg-blue-50 p-6 flex flex-col justify-between">
               <p className="text-xs text-blue-600 font-medium mb-2">{t("upgrade_title")}</p>
               <p className="text-sm text-gray-600 mb-4">{t("upgrade_desc")}</p>
-              <Link href="/pricing" className="text-center bg-blue-600 hover:bg-blue-700 text-white rounded-lg py-2 text-sm font-semibold">
+              <Link
+                href="/pricing"
+                className="text-center bg-blue-600 hover:bg-blue-700 text-white rounded-lg py-2 text-sm font-semibold"
+              >
                 {t("upgrade_cta")}
               </Link>
             </div>
           )}
         </div>
 
+        {/* 분석 히스토리 */}
         <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-100">
             <h2 className="font-semibold text-gray-900">{t("history_title")}</h2>
@@ -158,8 +191,17 @@ export default async function DashboardPage({
 
   const serviceClient = createServiceClient();
   const [{ data: userRaw }, { data: analysesRaw }] = await Promise.all([
-    serviceClient.from("users").select("plan, credits_used, credits_reset, email").eq("id", user.id).single(),
-    serviceClient.from("analyses").select("id, job_title, company_name, match_score, grade, created_at").eq("user_id", user.id).order("created_at", { ascending: false }).limit(10),
+    serviceClient
+      .from("users")
+      .select("plan_tier, credits_remaining, unlimited_expires_at, email")
+      .eq("id", user.id)
+      .single(),
+    serviceClient
+      .from("analyses")
+      .select("id, job_title, company_name, match_score, grade, created_at")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(10),
   ]);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -167,8 +209,5 @@ export default async function DashboardPage({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const analyses = (analysesRaw as any[] | null) as AnalysisItem[] | null;
 
-  const isPro = userData?.plan === "pro";
-  const creditsRemaining = isPro ? null : Math.max(0, 3 - (userData?.credits_used || 0));
-
-  return <DashboardView user={userData} analyses={analyses || []} isPro={isPro} creditsRemaining={creditsRemaining} />;
+  return <DashboardView user={userData} analyses={analyses || []} />;
 }

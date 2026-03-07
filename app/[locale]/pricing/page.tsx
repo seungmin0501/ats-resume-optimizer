@@ -11,20 +11,20 @@ export function generateStaticParams() {
 export const metadata: Metadata = {
   title: "Pricing — ATS Resume Optimizer",
   description:
-    "Start free with 3 scans/month. Upgrade to Pro for $12/month for unlimited scans and AI-optimized resume downloads.",
+    "One-time pricing. No subscription. Get your ATS match score, optimized resume, cover letter, and interview prep from $5.",
 };
 
 function CheckIcon() {
   return (
-    <svg className="w-5 h-5 text-green-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+    <svg className="w-4 h-4 text-green-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
     </svg>
   );
 }
 
 function XIcon() {
   return (
-    <svg className="w-5 h-5 text-gray-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg className="w-4 h-4 text-gray-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
     </svg>
   );
@@ -40,6 +40,90 @@ export default async function PricingPage({
   const t = await getTranslations("pricing");
   const tNav = await getTranslations("nav");
 
+  const plans = [
+    {
+      key: "free",
+      name: t("free_plan"),
+      price: "$0",
+      priceNote: null,
+      badge: null,
+      highlight: false,
+      ctaLabel: t("cta_free"),
+      ctaHref: "/analyze",
+      ctaStyle: "border border-blue-600 text-blue-600 hover:bg-blue-50",
+      features: [
+        { label: t("feature_scans_free"), included: true },
+        { label: t("feature_score"), included: true },
+        { label: t("feature_feedback_free"), included: true },
+        { label: t("feature_feedback_basic"), included: false },
+        { label: t("feature_docx"), included: false },
+        { label: t("feature_cover_letter"), included: false },
+        { label: t("feature_interview"), included: false },
+        { label: t("feature_multilingual"), included: false },
+      ],
+    },
+    {
+      key: "basic",
+      name: t("basic_plan"),
+      price: "$5",
+      priceNote: t("one_time"),
+      badge: null,
+      highlight: false,
+      ctaLabel: t("cta_basic"),
+      ctaHref: "/api/checkout?plan=basic",
+      ctaStyle: "border border-blue-600 text-blue-600 hover:bg-blue-50",
+      features: [
+        { label: t("feature_scans_basic"), included: true },
+        { label: t("feature_score"), included: true },
+        { label: t("feature_feedback_basic"), included: true },
+        { label: t("feature_docx"), included: true },
+        { label: t("feature_cover_letter"), included: false },
+        { label: t("feature_interview"), included: false },
+        { label: t("feature_multilingual"), included: false },
+      ],
+    },
+    {
+      key: "pro",
+      name: t("pro_plan"),
+      price: "$15",
+      priceNote: t("one_time"),
+      badge: t("most_popular"),
+      highlight: true,
+      ctaLabel: t("cta_pro"),
+      ctaHref: "/api/checkout?plan=pro",
+      ctaStyle: "bg-blue-600 hover:bg-blue-700 text-white",
+      features: [
+        { label: t("feature_scans_pro"), included: true },
+        { label: t("feature_score"), included: true },
+        { label: t("feature_feedback_pro"), included: true },
+        { label: t("feature_docx"), included: true },
+        { label: t("feature_cover_letter"), included: true },
+        { label: t("feature_interview"), included: true },
+        { label: t("feature_multilingual"), included: false },
+      ],
+    },
+    {
+      key: "unlimited",
+      name: t("unlimited_plan"),
+      price: "$29",
+      priceNote: t("one_time"),
+      badge: null,
+      highlight: false,
+      ctaLabel: t("cta_unlimited"),
+      ctaHref: "/api/checkout?plan=unlimited",
+      ctaStyle: "border border-purple-600 text-purple-600 hover:bg-purple-50",
+      features: [
+        { label: t("feature_scans_unlimited"), included: true },
+        { label: t("feature_score"), included: true },
+        { label: t("feature_feedback_pro"), included: true },
+        { label: t("feature_docx"), included: true },
+        { label: t("feature_cover_letter"), included: true },
+        { label: t("feature_interview"), included: true },
+        { label: t("feature_multilingual"), included: true },
+      ],
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Nav */}
@@ -48,83 +132,68 @@ export default async function PricingPage({
           <Link href="/" className="font-bold text-lg text-blue-600">{tNav("logo")}</Link>
           <div className="flex items-center gap-4">
             <LocaleSwitcher />
-            <Link href="/analyze" className="text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg transition-colors">
+            <Link
+              href="/analyze"
+              className="text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg transition-colors"
+            >
               {tNav("login")}
             </Link>
           </div>
         </div>
       </nav>
 
-      <div className="max-w-4xl mx-auto px-4 py-16">
-        <h1 className="text-4xl font-bold text-center text-gray-900 mb-3">
-          {t("title")}
-        </h1>
+      <div className="max-w-6xl mx-auto px-4 py-16">
+        <h1 className="text-4xl font-bold text-center text-gray-900 mb-3">{t("title")}</h1>
         <p className="text-center text-gray-500 mb-12">{t("subtitle")}</p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-3xl mx-auto">
-          {/* Free Plan */}
-          <div className="rounded-2xl border border-gray-200 bg-white p-8">
-            <h2 className="text-xl font-bold text-gray-900 mb-1">{t("free_plan")}</h2>
-            <div className="flex items-baseline gap-1 mb-6">
-              <span className="text-5xl font-bold text-gray-900">$0</span>
-              <span className="text-gray-500">{t("per_month")}</span>
-            </div>
-            <ul className="space-y-4 mb-8">
-              {[t("feature_scans_free"), t("feature_score"), t("feature_feedback_free")].map((f) => (
-                <li key={f} className="flex items-center gap-3 text-sm text-gray-700">
-                  <CheckIcon /> {f}
-                </li>
-              ))}
-              {[t("feature_docx"), t("feature_feedback_pro")].map((f) => (
-                <li key={f} className="flex items-center gap-3 text-sm text-gray-400 line-through">
-                  <XIcon /> {f}
-                </li>
-              ))}
-            </ul>
-            <Link
-              href="/analyze"
-              className="block text-center border border-blue-600 text-blue-600 hover:bg-blue-50 rounded-xl py-3 font-semibold transition-colors"
+        {/* Pricing grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {plans.map((plan) => (
+            <div
+              key={plan.key}
+              className={`rounded-2xl bg-white p-6 flex flex-col relative ${
+                plan.highlight
+                  ? "border-2 border-blue-600 shadow-lg shadow-blue-100"
+                  : "border border-gray-200"
+              }`}
             >
-              {t("cta_free")}
-            </Link>
-          </div>
+              {plan.badge && (
+                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-xs font-bold px-4 py-1 rounded-full whitespace-nowrap">
+                  {plan.badge}
+                </div>
+              )}
 
-          {/* Pro Plan */}
-          <div className="rounded-2xl border-2 border-blue-600 bg-white p-8 relative shadow-lg shadow-blue-100">
-            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-xs font-bold px-4 py-1 rounded-full">
-              {t("badge_best")}
-            </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-1">{t("pro_plan")}</h2>
-            <div className="flex items-baseline gap-1 mb-1">
-              <span className="text-5xl font-bold text-gray-900">$12</span>
-              <span className="text-gray-500">{t("per_month")}</span>
-            </div>
-            <p className="text-sm text-gray-400 mb-6">
-              or $99{t("per_year")} <span className="text-green-600 font-semibold">{t("save_badge")}</span>
-            </p>
-            <ul className="space-y-4 mb-8">
-              {[t("feature_scans_pro"), t("feature_score"), t("feature_feedback_pro"), t("feature_docx"), t("feature_history")].map((f) => (
-                <li key={f} className="flex items-center gap-3 text-sm text-gray-700">
-                  <CheckIcon /> {f}
-                </li>
-              ))}
-            </ul>
-            <div className="flex flex-col gap-2">
+              <div className="mb-5">
+                <h2 className="text-base font-bold text-gray-900 mb-1">{plan.name}</h2>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-4xl font-bold text-gray-900">{plan.price}</span>
+                  {plan.priceNote && (
+                    <span className="text-xs text-gray-400">{plan.priceNote}</span>
+                  )}
+                </div>
+              </div>
+
+              <ul className="space-y-2.5 mb-6 flex-1">
+                {plan.features.map((f) => (
+                  <li key={f.label} className={`flex items-start gap-2 text-sm ${f.included ? "text-gray-700" : "text-gray-300"}`}>
+                    {f.included ? <CheckIcon /> : <XIcon />}
+                    <span>{f.label}</span>
+                  </li>
+                ))}
+              </ul>
+
               <a
-                href="/api/checkout?plan=monthly"
-                className="block text-center bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3 font-semibold transition-colors"
+                href={plan.ctaHref}
+                className={`block text-center rounded-xl py-3 font-semibold text-sm transition-colors ${plan.ctaStyle}`}
               >
-                {t("cta_pro")}
-              </a>
-              <a
-                href="/api/checkout?plan=yearly"
-                className="block text-center border border-blue-600 text-blue-600 hover:bg-blue-50 rounded-xl py-2.5 text-sm font-semibold transition-colors"
-              >
-                {t("cta_pro_yearly")}
+                {plan.ctaLabel}
               </a>
             </div>
-          </div>
+          ))}
         </div>
+
+        {/* No subscription note */}
+        <p className="text-center text-sm text-gray-400 mt-8">{t("no_subscription")}</p>
 
         {/* FAQ */}
         <div className="mt-16 max-w-2xl mx-auto">

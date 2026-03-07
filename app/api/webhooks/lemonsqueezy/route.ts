@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyWebhookSignature } from "@/lib/lemonsqueezy";
+import { verifyWebhookSignature, getPlanMap } from "@/lib/lemonsqueezy";
 import { createServiceClient } from "@/lib/supabase";
 
 export async function POST(req: NextRequest) {
   const rawBody = await req.text();
   const signature = req.headers.get("x-signature") || "";
 
-  // 서명 검증
   if (!verifyWebhookSignature(rawBody, signature)) {
     return NextResponse.json({ error: "INVALID_SIGNATURE" }, { status: 401 });
   }
@@ -19,38 +18,45 @@ export async function POST(req: NextRequest) {
   const serviceClient = createServiceClient();
 
   try {
-    switch (eventName) {
-      case "subscription_created":
-      case "subscription_resumed":
-      case "subscription_unpaused": {
-        const userId = customData?.user_id as string | undefined;
-        if (!userId) break;
-
-        await serviceClient
-          .from("users")
-          .update({
-            plan: "pro",
-            ls_customer_id: String(attributes?.customer_id || ""),
-            ls_subscription_id: String(payload.data?.id || ""),
-          })
-          .eq("id", userId);
-        break;
+    if (eventName === "order_created") {
+      const userId = customData?.user_id as string | undefined;
+      if (!userId) {
+        return NextResponse.json({ received: true });
       }
 
-      case "subscription_cancelled":
-      case "subscription_expired": {
-        const subscriptionId = String(payload.data?.id || "");
-        if (!subscriptionId) break;
+      const variantId = String(attributes?.first_order_item?.variant_id || "");
+      const planMap = getPlanMap();
+      const planConfig = planMap[variantId];
 
-        await serviceClient
-          .from("users")
-          .update({ plan: "free" })
-          .eq("ls_subscription_id", subscriptionId);
-        break;
+      if (!planConfig) {
+        console.warn("[webhook] unknown variant_id:", variantId);
+        return NextResponse.json({ received: true });
       }
 
-      default:
-        break;
+      const update: Record<string, unknown> = {
+        plan_tier: planConfig.tier,
+        ls_customer_id: String(attributes?.customer_id || ""),
+        ls_order_id: String(payload.data?.id || ""),
+      };
+
+      if (planConfig.tier === "unlimited" && planConfig.days) {
+        const expires = new Date();
+        expires.setDate(expires.getDate() + planConfig.days);
+        update.unlimited_expires_at = expires.toISOString();
+        update.credits_remaining = 999;
+      } else {
+        // credits 누적 (기존 크레딧에 추가)
+        const { data: existingUser } = await serviceClient
+          .from("users")
+          .select("credits_remaining")
+          .eq("id", userId)
+          .single();
+
+        const current = (existingUser?.credits_remaining as number) ?? 0;
+        update.credits_remaining = current + planConfig.credits;
+      }
+
+      await serviceClient.from("users").update(update).eq("id", userId);
     }
   } catch (err) {
     console.error("[webhook] error:", err);

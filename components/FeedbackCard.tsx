@@ -13,7 +13,7 @@ type SectionKey = keyof SectionFeedback;
 
 type FeedbackCardProps = {
   feedback: SectionFeedback;
-  isPro: boolean;
+  isBasicOrAbove: boolean;
 };
 
 function ChevronIcon({ open }: { open: boolean }) {
@@ -34,7 +34,7 @@ function ChevronIcon({ open }: { open: boolean }) {
   );
 }
 
-export default function FeedbackCard({ feedback, isPro }: FeedbackCardProps) {
+export default function FeedbackCard({ feedback, isBasicOrAbove }: FeedbackCardProps) {
   const t = useTranslations("results");
   const [openSections, setOpenSections] = useState<Set<SectionKey>>(
     () => new Set<SectionKey>(["summary"])
@@ -66,7 +66,7 @@ export default function FeedbackCard({ feedback, isPro }: FeedbackCardProps) {
 
       <div className="space-y-2">
         {sections.map(({ key, label }, index) => {
-          const isLocked = !isPro && index > 0;
+          const isLocked = !isBasicOrAbove && index > 0;
           const isOpen = openSections.has(key);
 
           return (
@@ -107,7 +107,7 @@ export default function FeedbackCard({ feedback, isPro }: FeedbackCardProps) {
         })}
       </div>
 
-      {!isPro && (
+      {!isBasicOrAbove && (
         <button className="mt-4 w-full text-center text-sm text-blue-600 font-medium hover:text-blue-700">
           {t("blur_cta")} →
         </button>

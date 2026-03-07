@@ -34,7 +34,7 @@ export default async function AnalyzePage({
     const serviceClient = createServiceClient();
     const { data } = await serviceClient
       .from("users")
-      .select("plan, credits_used, credits_reset, email")
+      .select("plan_tier, credits_remaining, unlimited_expires_at, email")
       .eq("id", user.id)
       .single();
 
@@ -44,9 +44,9 @@ export default async function AnalyzePage({
     if (row) {
       userData = {
         email: row.email as string,
-        plan: row.plan as "free" | "pro",
-        creditsUsed: row.credits_used as number,
-        creditsReset: row.credits_reset as string | null,
+        planTier: (row.plan_tier ?? "free") as "free" | "basic" | "pro" | "unlimited",
+        creditsRemaining: (row.credits_remaining ?? 1) as number,
+        unlimitedExpiresAt: (row.unlimited_expires_at ?? null) as string | null,
         name: (user.user_metadata?.full_name || user.user_metadata?.name || null) as string | null,
         avatarUrl: (user.user_metadata?.avatar_url || null) as string | null,
       };
