@@ -74,21 +74,17 @@ export default function ScoreGauge({ score, grade }: ScoreGaugeProps) {
             />
           </svg>
           <div className="absolute inset-0 flex items-center justify-center">
-            <span
-              className={`text-3xl font-bold ${getScoreLabel(score)}`}
-            >
-              {score}
+            <span className={`text-4xl font-bold ${getScoreLabel(score)}`}>
+              {grade}
             </span>
           </div>
         </div>
 
-        {/* 등급 및 설명 */}
+        {/* 점수 및 설명 */}
         <div>
           <div className="flex items-baseline gap-2 mb-1">
-            <span
-              className={`text-5xl font-bold ${getScoreLabel(score)}`}
-            >
-              {grade}
+            <span className={`text-5xl font-bold ${getScoreLabel(score)}`}>
+              {score}
             </span>
             <span className="text-gray-400 text-lg">/ 100</span>
           </div>
