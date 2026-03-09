@@ -142,79 +142,61 @@ export default async function LandingPage({
             {t("pricing_title")}
           </h2>
           <p className="text-center text-gray-500 mb-12">{tPricing("subtitle")}</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {/* Free */}
-            <div className="rounded-2xl border border-gray-200 p-6 flex flex-col">
-              <p className="text-base font-bold text-gray-900 mb-1">{tPricing("free_plan")}</p>
-              <div className="flex items-baseline gap-1 mb-5">
-                <span className="text-3xl font-bold text-gray-900">$0</span>
-              </div>
-              <ul className="space-y-2 mb-6 flex-1 text-sm">
-                <li className="flex items-center gap-2 text-gray-700"><CheckIcon />{tPricing("feature_scans_free")}</li>
-                <li className="flex items-center gap-2 text-gray-700"><CheckIcon />{tPricing("feature_score")}</li>
-                <li className="flex items-center gap-2 text-gray-400"><XIcon />{tPricing("feature_docx")}</li>
-                <li className="flex items-center gap-2 text-gray-400"><XIcon />{tPricing("feature_cover_letter")}</li>
-              </ul>
-              <Link href="/analyze" className="block text-center border border-blue-600 text-blue-600 hover:bg-blue-50 rounded-xl py-2.5 font-semibold text-sm transition-colors">
-                {tPricing("cta_free")}
-              </Link>
-            </div>
-            {/* Basic */}
-            <div className="rounded-2xl border border-gray-200 p-6 flex flex-col">
-              <p className="text-base font-bold text-gray-900 mb-1">{tPricing("basic_plan")}</p>
-              <div className="flex items-baseline gap-1 mb-5">
-                <span className="text-3xl font-bold text-gray-900">$5</span>
-                <span className="text-xs text-gray-400">{tPricing("one_time")}</span>
-              </div>
-              <ul className="space-y-2 mb-6 flex-1 text-sm">
-                <li className="flex items-center gap-2 text-gray-700"><CheckIcon />{tPricing("feature_scans_basic")}</li>
-                <li className="flex items-center gap-2 text-gray-700"><CheckIcon />{tPricing("feature_feedback_basic")}</li>
-                <li className="flex items-center gap-2 text-gray-700"><CheckIcon />{tPricing("feature_docx")}</li>
-                <li className="flex items-center gap-2 text-gray-400"><XIcon />{tPricing("feature_cover_letter")}</li>
-              </ul>
-              <Link href="/pricing" className="block text-center border border-blue-600 text-blue-600 hover:bg-blue-50 rounded-xl py-2.5 font-semibold text-sm transition-colors">
-                {tPricing("cta_basic")}
-              </Link>
-            </div>
-            {/* Pro */}
-            <div className="rounded-2xl border-2 border-blue-600 p-6 flex flex-col relative shadow-lg shadow-blue-100">
-              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">
-                {t("pricing_badge")}
-              </div>
-              <p className="text-base font-bold text-gray-900 mb-1">{tPricing("pro_plan")}</p>
-              <div className="flex items-baseline gap-1 mb-5">
-                <span className="text-3xl font-bold text-gray-900">$15</span>
-                <span className="text-xs text-gray-400">{tPricing("one_time")}</span>
-              </div>
-              <ul className="space-y-2 mb-6 flex-1 text-sm">
-                <li className="flex items-center gap-2 text-gray-700"><CheckIcon />{tPricing("feature_scans_pro")}</li>
-                <li className="flex items-center gap-2 text-gray-700"><CheckIcon />{tPricing("feature_feedback_pro")}</li>
-                <li className="flex items-center gap-2 text-gray-700"><CheckIcon />{tPricing("feature_docx")}</li>
-                <li className="flex items-center gap-2 text-gray-700"><CheckIcon />{tPricing("feature_cover_letter")}</li>
-              </ul>
-              <Link href="/pricing" className="block text-center bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-2.5 font-semibold text-sm transition-colors">
-                {tPricing("cta_pro")}
-              </Link>
-            </div>
-            {/* Unlimited */}
-            <div className="rounded-2xl border border-gray-200 p-6 flex flex-col">
-              <p className="text-base font-bold text-gray-900 mb-1">{tPricing("unlimited_plan")}</p>
-              <div className="flex items-baseline gap-1 mb-5">
-                <span className="text-3xl font-bold text-gray-900">$29</span>
-                <span className="text-xs text-gray-400">{tPricing("one_time")}</span>
-              </div>
-              <ul className="space-y-2 mb-6 flex-1 text-sm">
-                <li className="flex items-center gap-2 text-gray-700"><CheckIcon />{tPricing("feature_scans_unlimited")}</li>
-                <li className="flex items-center gap-2 text-gray-700"><CheckIcon />{tPricing("feature_feedback_pro")}</li>
-                <li className="flex items-center gap-2 text-gray-700"><CheckIcon />{tPricing("feature_cover_letter")}</li>
-                <li className="flex items-center gap-2 text-gray-700"><CheckIcon />{tPricing("feature_multilingual")}</li>
-              </ul>
-              <Link href="/pricing" className="block text-center border border-purple-600 text-purple-600 hover:bg-purple-50 rounded-xl py-2.5 font-semibold text-sm transition-colors">
-                {tPricing("cta_unlimited")}
-              </Link>
-            </div>
+          {/* 플랜 요약 테이블 */}
+          <div className="overflow-x-auto mb-10">
+            <table className="w-full text-sm text-center">
+              <thead>
+                <tr className="border-b border-gray-200">
+                  <th className="text-left py-3 pr-4 font-medium text-gray-500 w-40"></th>
+                  <th className="py-3 px-4 font-semibold text-gray-700">Free</th>
+                  <th className="py-3 px-4 font-semibold text-gray-700">Basic<br /><span className="font-normal text-gray-400 text-xs">$5</span></th>
+                  <th className="py-3 px-4 font-semibold text-blue-600">Pro<br /><span className="font-normal text-blue-400 text-xs">$15</span></th>
+                  <th className="py-3 px-4 font-semibold text-purple-600">Unlimited<br /><span className="font-normal text-purple-400 text-xs">$29</span></th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                <tr>
+                  <td className="text-left py-3 pr-4 text-gray-600">{tPricing("feature_score")}</td>
+                  <td><CheckIcon /></td><td><CheckIcon /></td><td><CheckIcon /></td><td><CheckIcon /></td>
+                </tr>
+                <tr>
+                  <td className="text-left py-3 pr-4 text-gray-600">{tPricing("feature_feedback_basic")}</td>
+                  <td><XIcon /></td><td><CheckIcon /></td><td><CheckIcon /></td><td><CheckIcon /></td>
+                </tr>
+                <tr>
+                  <td className="text-left py-3 pr-4 text-gray-600">{tPricing("feature_docx")}</td>
+                  <td><XIcon /></td><td><CheckIcon /></td><td><CheckIcon /></td><td><CheckIcon /></td>
+                </tr>
+                <tr>
+                  <td className="text-left py-3 pr-4 text-gray-600">{tPricing("feature_cover_letter")}</td>
+                  <td><XIcon /></td><td><XIcon /></td><td><CheckIcon /></td><td><CheckIcon /></td>
+                </tr>
+                <tr>
+                  <td className="text-left py-3 pr-4 text-gray-600">{tPricing("feature_multilingual")}</td>
+                  <td><XIcon /></td><td><XIcon /></td><td><XIcon /></td><td><CheckIcon /></td>
+                </tr>
+                <tr>
+                  <td className="text-left py-3 pr-4 text-gray-600">Scans</td>
+                  <td className="text-gray-500">1</td>
+                  <td className="text-gray-700">3</td>
+                  <td className="text-blue-600 font-medium">10</td>
+                  <td className="text-purple-600 font-medium">∞ 90d</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          <p className="text-center text-sm text-gray-400 mt-8">{tPricing("no_subscription")}</p>
+          <div className="flex justify-center">
+            <Link
+              href="/pricing"
+              className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-8 py-3.5 font-semibold transition-colors shadow-lg shadow-blue-100"
+            >
+              {t("pricing_cta")}
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </Link>
+          </div>
+          <p className="text-center text-sm text-gray-400 mt-4">{tPricing("no_subscription")}</p>
         </div>
       </section>
 
