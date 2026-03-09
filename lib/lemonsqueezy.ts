@@ -59,18 +59,34 @@ export async function getCheckoutUrl(
     },
   };
 
-  const response = await fetch("https://api.lemonsqueezy.com/v1/checkouts", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${process.env.LEMONSQUEEZY_API_KEY}`,
-      "Content-Type": "application/vnd.api+json",
-      Accept: "application/vnd.api+json",
-    },
-    body: JSON.stringify(body),
-  });
+  console.log("[checkout] storeId:", storeId, "variantId:", variantId);
+  console.log("[checkout] apiKey set:", !!process.env.LEMONSQUEEZY_API_KEY);
 
-  if (!response.ok) throw new Error("Failed to create checkout");
+  let response: Response;
+  try {
+    response = await fetch("https://api.lemonsqueezy.com/v1/checkouts", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.LEMONSQUEEZY_API_KEY}`,
+        "Content-Type": "application/vnd.api+json",
+        Accept: "application/vnd.api+json",
+      },
+      body: JSON.stringify(body),
+    });
+  } catch (fetchErr) {
+    console.error("[checkout] fetch threw:", fetchErr);
+    throw new Error("Failed to create checkout");
+  }
+
+  console.log("[checkout] LS status:", response.status);
+
+  if (!response.ok) {
+    const errBody = await response.json().catch(() => ({}));
+    console.error("[checkout] LemonSqueezy error:", response.status, JSON.stringify(errBody));
+    throw new Error("Failed to create checkout");
+  }
 
   const data = await response.json();
+  console.log("[checkout] url:", data?.data?.attributes?.url);
   return data.data.attributes.url;
 }
