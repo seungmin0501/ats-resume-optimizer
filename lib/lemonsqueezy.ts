@@ -59,26 +59,15 @@ export async function getCheckoutUrl(
     },
   };
 
-  console.log("[checkout] storeId:", storeId, "variantId:", variantId);
-  console.log("[checkout] apiKey set:", !!process.env.LEMONSQUEEZY_API_KEY);
-
-  let response: Response;
-  try {
-    response = await fetch("https://api.lemonsqueezy.com/v1/checkouts", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.LEMONSQUEEZY_API_KEY}`,
-        "Content-Type": "application/vnd.api+json",
-        Accept: "application/vnd.api+json",
-      },
-      body: JSON.stringify(body),
-    });
-  } catch (fetchErr) {
-    console.error("[checkout] fetch threw:", fetchErr);
-    throw new Error("Failed to create checkout");
-  }
-
-  console.log("[checkout] LS status:", response.status);
+  const response = await fetch("https://api.lemonsqueezy.com/v1/checkouts", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${process.env.LEMONSQUEEZY_API_KEY}`,
+      "Content-Type": "application/vnd.api+json",
+      Accept: "application/vnd.api+json",
+    },
+    body: JSON.stringify(body),
+  });
 
   if (!response.ok) {
     const errBody = await response.json().catch(() => ({}));
@@ -87,6 +76,5 @@ export async function getCheckoutUrl(
   }
 
   const data = await response.json();
-  console.log("[checkout] url:", data?.data?.attributes?.url);
   return data.data.attributes.url;
 }
