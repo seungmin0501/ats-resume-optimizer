@@ -28,7 +28,8 @@ export async function GET(req: NextRequest) {
   try {
     const checkoutUrl = await getCheckoutUrl(variantId, user.id, user.email);
     return NextResponse.redirect(checkoutUrl);
-  } catch {
+  } catch (err) {
+    console.error("[checkout] error:", err);
     return NextResponse.json({ error: "CHECKOUT_FAILED" }, { status: 500 });
   }
 }
