@@ -23,11 +23,14 @@ export async function GET(req: NextRequest) {
     {
       id: data.user.id,
       email: data.user.email!,
-      plan: "free",
-      credits_used: 0,
+      plan_tier: "free",
+      credits_remaining: 1,
     },
     { onConflict: "id", ignoreDuplicates: true }
   );
 
-  return NextResponse.redirect(`${origin}/analyze`);
+  const next = req.cookies.get("auth_next")?.value || "/analyze";
+  const res = NextResponse.redirect(`${origin}${next}`);
+  res.cookies.delete("auth_next");
+  return res;
 }

@@ -45,14 +45,15 @@ export async function POST(req: NextRequest) {
         update.unlimited_expires_at = expires.toISOString();
         update.credits_remaining = 999;
       } else {
-        // credits 누적 (기존 크레딧에 추가)
         const { data: existingUser } = await serviceClient
           .from("users")
-          .select("credits_remaining")
+          .select("credits_remaining, plan_tier")
           .eq("id", userId)
           .single();
 
-        const current = (existingUser?.credits_remaining as number) ?? 0;
+        // Unlimited에서 하위 플랜으로 변경 시 누적하지 않고 새 크레딧으로 설정
+        const wasUnlimited = existingUser?.plan_tier === "unlimited";
+        const current = wasUnlimited ? 0 : ((existingUser?.credits_remaining as number) ?? 0);
         update.credits_remaining = current + planConfig.credits;
       }
 

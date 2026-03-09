@@ -35,7 +35,8 @@ export function verifyWebhookSignature(
 export async function getCheckoutUrl(
   variantId: string,
   userId: string,
-  email?: string
+  email?: string,
+  successUrl?: string
 ): Promise<string> {
   const storeId = process.env.LEMONSQUEEZY_STORE_ID!;
 
@@ -43,6 +44,9 @@ export async function getCheckoutUrl(
     data: {
       type: "checkouts",
       attributes: {
+        product_options: {
+          ...(successUrl && { redirect_url: successUrl }),
+        },
         checkout_data: {
           email: email || "",
           custom: { user_id: userId },

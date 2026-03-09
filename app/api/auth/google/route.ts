@@ -3,7 +3,8 @@ import { createServerSupabaseClient } from "@/lib/supabase-server";
 
 export async function GET(req: NextRequest) {
   const supabase = await createServerSupabaseClient();
-  const origin = new URL(req.url).origin;
+  const { origin, searchParams } = new URL(req.url);
+  const next = searchParams.get("next") || "/analyze";
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
@@ -13,8 +14,11 @@ export async function GET(req: NextRequest) {
   });
 
   if (error || !data.url) {
+    console.error("[auth/google] OAuth error:", error);
     return NextResponse.redirect(`${origin}/analyze?error=oauth`);
   }
 
-  return NextResponse.redirect(data.url);
+  const res = NextResponse.redirect(data.url);
+  res.cookies.set("auth_next", next, { httpOnly: true, maxAge: 300, path: "/" });
+  return res;
 }

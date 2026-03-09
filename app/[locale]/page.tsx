@@ -48,9 +48,6 @@ export default async function LandingPage({
   const name = user?.user_metadata?.full_name || user?.user_metadata?.name || null;
   const avatarUrl = user?.user_metadata?.avatar_url || null;
 
-  const freeFeatures = t("pricing_free_features").split(",");
-  const proFeatures = t("pricing_pro_features").split(",");
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Nav */}
@@ -82,7 +79,7 @@ export default async function LandingPage({
               </div>
             ) : (
               <a
-                href="/api/auth/google"
+                href="/api/auth/google?next=/"
                 className="text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg transition-colors"
               >
                 {tNav("login")}
@@ -140,61 +137,84 @@ export default async function LandingPage({
 
       {/* Pricing */}
       <section className="bg-white border-t border-gray-200 py-24">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
+        <div className="max-w-5xl mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-4">
             {t("pricing_title")}
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-2xl mx-auto">
+          <p className="text-center text-gray-500 mb-12">{tPricing("subtitle")}</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {/* Free */}
-            <div className="rounded-2xl border border-gray-200 p-8">
-              <p className="text-lg font-semibold text-gray-900 mb-1">{tPricing("free_plan")}</p>
-              <div className="flex items-baseline gap-1 mb-6">
-                <span className="text-4xl font-bold text-gray-900">$0</span>
-                <span className="text-gray-500 text-sm">{tPricing("per_month")}</span>
+            <div className="rounded-2xl border border-gray-200 p-6 flex flex-col">
+              <p className="text-base font-bold text-gray-900 mb-1">{tPricing("free_plan")}</p>
+              <div className="flex items-baseline gap-1 mb-5">
+                <span className="text-3xl font-bold text-gray-900">$0</span>
               </div>
-              <ul className="space-y-3 mb-8">
-                {freeFeatures.map((f) => (
-                  <li key={f} className="flex items-center gap-2 text-sm text-gray-700">
-                    <CheckIcon /> {f}
-                  </li>
-                ))}
-                <li className="flex items-center gap-2 text-sm text-gray-400 line-through">
-                  <XIcon /> {tPricing("feature_docx")}
-                </li>
+              <ul className="space-y-2 mb-6 flex-1 text-sm">
+                <li className="flex items-center gap-2 text-gray-700"><CheckIcon />{tPricing("feature_scans_free")}</li>
+                <li className="flex items-center gap-2 text-gray-700"><CheckIcon />{tPricing("feature_score")}</li>
+                <li className="flex items-center gap-2 text-gray-400"><XIcon />{tPricing("feature_docx")}</li>
+                <li className="flex items-center gap-2 text-gray-400"><XIcon />{tPricing("feature_cover_letter")}</li>
               </ul>
-              <Link
-                href="/analyze"
-                className="block text-center border border-blue-600 text-blue-600 hover:bg-blue-50 rounded-xl py-3 font-semibold transition-colors"
-              >
+              <Link href="/analyze" className="block text-center border border-blue-600 text-blue-600 hover:bg-blue-50 rounded-xl py-2.5 font-semibold text-sm transition-colors">
                 {tPricing("cta_free")}
               </Link>
             </div>
-
+            {/* Basic */}
+            <div className="rounded-2xl border border-gray-200 p-6 flex flex-col">
+              <p className="text-base font-bold text-gray-900 mb-1">{tPricing("basic_plan")}</p>
+              <div className="flex items-baseline gap-1 mb-5">
+                <span className="text-3xl font-bold text-gray-900">$5</span>
+                <span className="text-xs text-gray-400">{tPricing("one_time")}</span>
+              </div>
+              <ul className="space-y-2 mb-6 flex-1 text-sm">
+                <li className="flex items-center gap-2 text-gray-700"><CheckIcon />{tPricing("feature_scans_basic")}</li>
+                <li className="flex items-center gap-2 text-gray-700"><CheckIcon />{tPricing("feature_feedback_basic")}</li>
+                <li className="flex items-center gap-2 text-gray-700"><CheckIcon />{tPricing("feature_docx")}</li>
+                <li className="flex items-center gap-2 text-gray-400"><XIcon />{tPricing("feature_cover_letter")}</li>
+              </ul>
+              <Link href="/pricing" className="block text-center border border-blue-600 text-blue-600 hover:bg-blue-50 rounded-xl py-2.5 font-semibold text-sm transition-colors">
+                {tPricing("cta_basic")}
+              </Link>
+            </div>
             {/* Pro */}
-            <div className="rounded-2xl border-2 border-blue-600 p-8 relative shadow-lg shadow-blue-100">
-              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-xs font-bold px-4 py-1 rounded-full whitespace-nowrap">
+            <div className="rounded-2xl border-2 border-blue-600 p-6 flex flex-col relative shadow-lg shadow-blue-100">
+              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">
                 {t("pricing_badge")}
               </div>
-              <p className="text-lg font-semibold text-gray-900 mb-1">{tPricing("pro_plan")}</p>
-              <div className="flex items-baseline gap-1 mb-6">
-                <span className="text-4xl font-bold text-gray-900">$12</span>
-                <span className="text-gray-500 text-sm">{tPricing("per_month")}</span>
+              <p className="text-base font-bold text-gray-900 mb-1">{tPricing("pro_plan")}</p>
+              <div className="flex items-baseline gap-1 mb-5">
+                <span className="text-3xl font-bold text-gray-900">$15</span>
+                <span className="text-xs text-gray-400">{tPricing("one_time")}</span>
               </div>
-              <ul className="space-y-3 mb-8">
-                {proFeatures.map((f) => (
-                  <li key={f} className="flex items-center gap-2 text-sm text-gray-700">
-                    <CheckIcon /> {f}
-                  </li>
-                ))}
+              <ul className="space-y-2 mb-6 flex-1 text-sm">
+                <li className="flex items-center gap-2 text-gray-700"><CheckIcon />{tPricing("feature_scans_pro")}</li>
+                <li className="flex items-center gap-2 text-gray-700"><CheckIcon />{tPricing("feature_feedback_pro")}</li>
+                <li className="flex items-center gap-2 text-gray-700"><CheckIcon />{tPricing("feature_docx")}</li>
+                <li className="flex items-center gap-2 text-gray-700"><CheckIcon />{tPricing("feature_cover_letter")}</li>
               </ul>
-              <Link
-                href="/pricing"
-                className="block text-center bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3 font-semibold transition-colors"
-              >
+              <Link href="/pricing" className="block text-center bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-2.5 font-semibold text-sm transition-colors">
                 {tPricing("cta_pro")}
               </Link>
             </div>
+            {/* Unlimited */}
+            <div className="rounded-2xl border border-gray-200 p-6 flex flex-col">
+              <p className="text-base font-bold text-gray-900 mb-1">{tPricing("unlimited_plan")}</p>
+              <div className="flex items-baseline gap-1 mb-5">
+                <span className="text-3xl font-bold text-gray-900">$29</span>
+                <span className="text-xs text-gray-400">{tPricing("one_time")}</span>
+              </div>
+              <ul className="space-y-2 mb-6 flex-1 text-sm">
+                <li className="flex items-center gap-2 text-gray-700"><CheckIcon />{tPricing("feature_scans_unlimited")}</li>
+                <li className="flex items-center gap-2 text-gray-700"><CheckIcon />{tPricing("feature_feedback_pro")}</li>
+                <li className="flex items-center gap-2 text-gray-700"><CheckIcon />{tPricing("feature_cover_letter")}</li>
+                <li className="flex items-center gap-2 text-gray-700"><CheckIcon />{tPricing("feature_multilingual")}</li>
+              </ul>
+              <Link href="/pricing" className="block text-center border border-purple-600 text-purple-600 hover:bg-purple-50 rounded-xl py-2.5 font-semibold text-sm transition-colors">
+                {tPricing("cta_unlimited")}
+              </Link>
+            </div>
           </div>
+          <p className="text-center text-sm text-gray-400 mt-8">{tPricing("no_subscription")}</p>
         </div>
       </section>
 

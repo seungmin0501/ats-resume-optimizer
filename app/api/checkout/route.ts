@@ -26,7 +26,8 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const checkoutUrl = await getCheckoutUrl(variantId, user.id, user.email);
+    const successUrl = `${new URL(req.url).origin}/analyze`;
+    const checkoutUrl = await getCheckoutUrl(variantId, user.id, user.email, successUrl);
     return NextResponse.redirect(checkoutUrl);
   } catch (err) {
     console.error("[checkout] error:", err);
