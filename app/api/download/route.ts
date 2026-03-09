@@ -64,13 +64,14 @@ export async function POST(req: NextRequest) {
     const serviceClient = createServiceClient();
     const { data: userData } = await serviceClient
       .from("users")
-      .select("plan")
+      .select("plan_tier")
       .eq("id", user.id)
       .single();
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if (!userData || (userData as any).plan !== "pro") {
-      return NextResponse.json({ error: "PRO_REQUIRED" }, { status: 403 });
+    const tier = (userData as any)?.plan_tier;
+    if (!tier || tier === "free") {
+      return NextResponse.json({ error: "BASIC_REQUIRED" }, { status: 403 });
     }
 
     // 3. 분석 데이터 조회
