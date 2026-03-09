@@ -12,7 +12,7 @@ type InterviewQuestion = {
 type InterviewPrepProps = {
   data: { questions: InterviewQuestion[] } | null;
   isProOrAbove: boolean;
-  onUpgradeClick: () => void;
+  onUpgradeClick?: () => void;
 };
 
 function ChevronIcon({ open }: { open: boolean }) {
@@ -91,12 +91,18 @@ export default function InterviewPrep({ data, isProOrAbove, onUpgradeClick }: In
               </div>
             ))}
           </div>
-          <button
-            onClick={onUpgradeClick}
-            className="mt-4 w-full text-center text-sm text-blue-600 font-medium hover:text-blue-700"
-          >
-            {t("blur_cta_pro")} →
-          </button>
+          {onUpgradeClick ? (
+            <button
+              onClick={onUpgradeClick}
+              className="mt-4 w-full text-center text-sm text-blue-600 font-medium hover:text-blue-700"
+            >
+              {t("blur_cta_pro")} →
+            </button>
+          ) : (
+            <a href="/pricing" className="mt-4 block w-full text-center text-sm text-blue-600 font-medium hover:text-blue-700">
+              {t("blur_cta_pro")} →
+            </a>
+          )}
         </div>
       )}
     </div>

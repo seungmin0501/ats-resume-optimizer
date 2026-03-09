@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 type CoverLetterProps = {
   content: string | null;
   isProOrAbove: boolean;
-  onUpgradeClick: () => void;
+  onUpgradeClick?: () => void;
 };
 
 export default function CoverLetter({ content, isProOrAbove, onUpgradeClick }: CoverLetterProps) {
@@ -41,12 +41,18 @@ export default function CoverLetter({ content, isProOrAbove, onUpgradeClick }: C
           <div className="text-sm text-gray-300 leading-relaxed select-none blur-sm pointer-events-none line-clamp-4">
             Dear Hiring Manager, I am writing to express my strong interest in the position at your company. With my background in software engineering and proven track record of delivering high-quality solutions, I am confident I would be a valuable addition to your team. My experience aligns closely with the requirements outlined in your job description...
           </div>
-          <button
-            onClick={onUpgradeClick}
-            className="mt-4 w-full text-center text-sm text-blue-600 font-medium hover:text-blue-700"
-          >
-            {t("blur_cta_pro")} →
-          </button>
+          {onUpgradeClick ? (
+            <button
+              onClick={onUpgradeClick}
+              className="mt-4 w-full text-center text-sm text-blue-600 font-medium hover:text-blue-700"
+            >
+              {t("blur_cta_pro")} →
+            </button>
+          ) : (
+            <a href="/pricing" className="mt-4 block w-full text-center text-sm text-blue-600 font-medium hover:text-blue-700">
+              {t("blur_cta_pro")} →
+            </a>
+          )}
         </div>
       )}
     </div>

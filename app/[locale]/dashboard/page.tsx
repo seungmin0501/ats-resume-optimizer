@@ -151,9 +151,9 @@ function DashboardView({
           ) : (
             <div className="divide-y divide-gray-100">
               {analyses.map((analysis) => (
-                <div key={analysis.id} className="px-6 py-4 flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">
+                <div key={analysis.id} className="px-6 py-4 flex items-center justify-between gap-4">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-gray-900 truncate">
                       {analysis.company_name || t("unknown_company")}
                       {analysis.job_title && (
                         <span className="text-gray-500 font-normal"> — {analysis.job_title}</span>
@@ -163,9 +163,15 @@ function DashboardView({
                       {new Date(analysis.created_at).toLocaleDateString()}
                     </p>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 shrink-0">
                     <ScoreBadge score={analysis.match_score} />
                     <span className="text-xs text-gray-400">{t("grade_prefix")} {analysis.grade}</span>
+                    <Link
+                      href={`/dashboard/${analysis.id}`}
+                      className="text-xs text-blue-600 hover:text-blue-700 font-medium"
+                    >
+                      {t("history_view")} →
+                    </Link>
                   </div>
                 </div>
               ))}
@@ -201,7 +207,7 @@ export default async function DashboardPage({
       .select("id, job_title, company_name, match_score, grade, created_at")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
-      .limit(10),
+      .limit(20),
   ]);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
