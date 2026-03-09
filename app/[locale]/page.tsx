@@ -172,10 +172,6 @@ export default async function LandingPage({
                   <td><XIcon /></td><td><XIcon /></td><td><CheckIcon /></td><td><CheckIcon /></td>
                 </tr>
                 <tr>
-                  <td className="text-left py-3 pr-4 text-gray-600">{tPricing("feature_multilingual")}</td>
-                  <td><XIcon /></td><td><XIcon /></td><td><XIcon /></td><td><CheckIcon /></td>
-                </tr>
-                <tr>
                   <td className="text-left py-3 pr-4 text-gray-600">Scans</td>
                   <td className="text-gray-500">1</td>
                   <td className="text-gray-700">3</td>

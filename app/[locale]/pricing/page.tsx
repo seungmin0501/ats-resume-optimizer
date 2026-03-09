@@ -119,7 +119,7 @@ export default async function PricingPage({
         { label: t("feature_docx"), included: true },
         { label: t("feature_cover_letter"), included: true },
         { label: t("feature_interview"), included: true },
-        { label: t("feature_multilingual"), included: true },
+        { label: t("feature_multilingual"), included: false },
       ],
     },
   ];

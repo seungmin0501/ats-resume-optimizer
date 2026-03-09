@@ -81,7 +81,6 @@ export default function AnalyzeClient({ user }: Props) {
 
   const [jobText, setJobText] = useState("");
   const [resumeFile, setResumeFile] = useState<File | null>(null);
-  const [targetLanguage, setTargetLanguage] = useState("en");
   const [analyzing, setAnalyzing] = useState(false);
   const [result, setResult] = useState<AnalysisResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -117,7 +116,6 @@ export default function AnalyzeClient({ user }: Props) {
       const formData = new FormData();
       formData.append("job_description", jobText);
       formData.append("resume", resumeFile!);
-      if (isUnlimitedActive) formData.append("target_language", targetLanguage);
 
       const res = await fetch("/api/analyze", { method: "POST", body: formData });
       const data = await res.json();
@@ -229,25 +227,6 @@ export default function AnalyzeClient({ user }: Props) {
               <label className="block text-sm font-medium text-gray-700 mb-2">{t("resume_input_label")}</label>
               <UploadZone onFileLoaded={setResumeFile} fileName={resumeFile?.name} />
             </div>
-            {isUnlimitedActive && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Output Language
-                  <span className="ml-2 text-xs font-normal text-purple-600 bg-purple-50 px-1.5 py-0.5 rounded">Unlimited</span>
-                </label>
-                <select
-                  value={targetLanguage}
-                  onChange={(e) => setTargetLanguage(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="en">English</option>
-                  <option value="ko">한국어</option>
-                  <option value="ja">日本語</option>
-                  <option value="es">Español</option>
-                  <option value="zh-CN">中文</option>
-                </select>
-              </div>
-            )}
             <button
               onClick={handleAnalyze}
               disabled={!canAnalyze || analyzing}

@@ -44,16 +44,12 @@ export async function analyzeResume(
   resumeText: string,
   isBasicOrAbove: boolean,
   isProOrAbove: boolean,
-  targetLanguage: string = "en"
 ): Promise<AnalysisResult> {
   // GPT 비용 보호: 입력 최대 5,000자로 제한
   const truncatedJob = jobDescription.slice(0, 5000);
   const truncatedResume = resumeText.slice(0, 5000);
 
-  const langInstruction =
-    targetLanguage !== "en"
-      ? `\nIMPORTANT: Write all string values (section_feedback, optimized_resume, cover_letter, interview answers) in language code "${targetLanguage}". Keep JSON keys in English.`
-      : "";
+  const langInstruction = `\nIMPORTANT: Detect the language of the job posting and write ALL string values (section_feedback, optimized_resume, cover_letter, interview questions and answers) in that same language. Keep JSON keys in English.`;
 
   const optimizedResumeField = isBasicOrAbove
     ? `"optimized_resume": <full rewritten resume as plain text, naturally incorporating missing keywords>`

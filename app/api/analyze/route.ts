@@ -67,7 +67,6 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
     const resumeFile = formData.get("resume") as File | null;
     const jobDescription = formData.get("job_description") as string | null;
-    const targetLanguage = (formData.get("target_language") as string) || "en";
 
     if (!resumeFile || !jobDescription) {
       return NextResponse.json({ error: "MISSING_FIELDS" }, { status: 400 });
@@ -105,7 +104,6 @@ export async function POST(req: NextRequest) {
     const tier = currentUser.plan_tier;
     const isBasicOrAbove = tier === "basic" || tier === "pro" || tier === "unlimited";
     const isProOrAbove = tier === "pro" || tier === "unlimited";
-    const isUnlimited = tier === "unlimited";
 
     // 7. GPT 분석
     const result = await analyzeResume(
@@ -113,7 +111,6 @@ export async function POST(req: NextRequest) {
       resumeText,
       isBasicOrAbove,
       isProOrAbove,
-      isUnlimited ? targetLanguage : "en"
     );
 
     // 8. 분석 결과 저장
@@ -131,7 +128,6 @@ export async function POST(req: NextRequest) {
         optimized_resume: isBasicOrAbove ? result.optimized_resume : null,
         cover_letter: isProOrAbove ? result.cover_letter : null,
         interview_prep: isProOrAbove ? result.interview_prep : null,
-        target_language: isUnlimited ? targetLanguage : "en",
       })
       .select()
       .single();
