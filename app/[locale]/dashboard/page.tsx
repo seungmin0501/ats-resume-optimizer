@@ -54,12 +54,49 @@ type UserData = {
   email: string;
 };
 
+const PAGE_SIZE = 20;
+
+function Pagination({ page, totalPages }: { page: number; totalPages: number }) {
+  if (totalPages <= 1) return null;
+  return (
+    <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+      <Link
+        href={page > 1 ? `?page=${page - 1}` : "#"}
+        className={`text-sm font-medium px-3 py-1.5 rounded-lg transition-colors ${
+          page > 1
+            ? "text-blue-600 hover:bg-blue-50"
+            : "text-gray-300 pointer-events-none"
+        }`}
+      >
+        ← Prev
+      </Link>
+      <span className="text-sm text-gray-500">
+        {page} / {totalPages}
+      </span>
+      <Link
+        href={page < totalPages ? `?page=${page + 1}` : "#"}
+        className={`text-sm font-medium px-3 py-1.5 rounded-lg transition-colors ${
+          page < totalPages
+            ? "text-blue-600 hover:bg-blue-50"
+            : "text-gray-300 pointer-events-none"
+        }`}
+      >
+        Next →
+      </Link>
+    </div>
+  );
+}
+
 function DashboardView({
   user,
   analyses,
+  page,
+  totalPages,
 }: {
   user: UserData | null;
   analyses: AnalysisItem[];
+  page: number;
+  totalPages: number;
 }) {
   const t = useTranslations("dashboard");
   const tNav = useTranslations("nav");
@@ -177,6 +214,7 @@ function DashboardView({
               ))}
             </div>
           )}
+          <Pagination page={page} totalPages={totalPages} />
         </div>
       </div>
     </div>
@@ -185,18 +223,25 @@ function DashboardView({
 
 export default async function DashboardPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ page?: string }>;
 }) {
   const { locale } = await params;
+  const { page: pageParam } = await searchParams;
   setRequestLocale(locale);
+
+  const page = Math.max(1, parseInt(pageParam ?? "1", 10) || 1);
+  const offset = (page - 1) * PAGE_SIZE;
+
   const supabase = await createServerSupabaseClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) redirect(`/${locale}/analyze`);
 
   const serviceClient = createServiceClient();
-  const [{ data: userRaw }, { data: analysesRaw }] = await Promise.all([
+  const [{ data: userRaw }, { data: analysesRaw }, { count }] = await Promise.all([
     serviceClient
       .from("users")
       .select("plan_tier, credits_remaining, unlimited_expires_at, email")
@@ -207,13 +252,25 @@ export default async function DashboardPage({
       .select("id, job_title, company_name, match_score, grade, created_at")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
-      .limit(20),
+      .range(offset, offset + PAGE_SIZE - 1),
+    serviceClient
+      .from("analyses")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", user.id),
   ]);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const userData = userRaw as any as UserData | null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const analyses = (analysesRaw as any[] | null) as AnalysisItem[] | null;
+  const totalPages = Math.max(1, Math.ceil((count ?? 0) / PAGE_SIZE));
 
-  return <DashboardView user={userData} analyses={analyses || []} />;
+  return (
+    <DashboardView
+      user={userData}
+      analyses={analyses || []}
+      page={page}
+      totalPages={totalPages}
+    />
+  );
 }
