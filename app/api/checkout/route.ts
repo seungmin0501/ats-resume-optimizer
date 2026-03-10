@@ -14,11 +14,13 @@ export async function GET(req: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
-    return NextResponse.redirect(new URL("/analyze", req.url));
-  }
-
   const plan = req.nextUrl.searchParams.get("plan") ?? "";
+
+  if (!user) {
+    const loginUrl = new URL("/api/auth/google", req.url);
+    loginUrl.searchParams.set("next", `/api/checkout?plan=${plan}`);
+    return NextResponse.redirect(loginUrl);
+  }
   const variantId = PLAN_VARIANT[plan];
 
   if (!variantId) {

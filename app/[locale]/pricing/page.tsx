@@ -194,23 +194,6 @@ export default async function PricingPage({
 
         {/* No subscription note */}
         <p className="text-center text-sm text-gray-400 mt-8">{t("no_subscription")}</p>
-
-        {/* FAQ */}
-        <div className="mt-16 max-w-2xl mx-auto">
-          <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">{t("faq_title")}</h2>
-          <div className="space-y-6">
-            {[
-              { q: t("faq_1_q"), a: t("faq_1_a") },
-              { q: t("faq_2_q"), a: t("faq_2_a") },
-              { q: t("faq_3_q"), a: t("faq_3_a") },
-            ].map(({ q, a }) => (
-              <div key={q} className="border-b border-gray-100 pb-6">
-                <h3 className="font-semibold text-gray-900 mb-2">{q}</h3>
-                <p className="text-gray-500 text-sm leading-relaxed">{a}</p>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
     </div>
   );

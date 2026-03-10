@@ -25,7 +25,7 @@
     "pricing_pro_features": "Unlimited scans,Full section feedback,Optimized resume (.docx),Analysis history",
     "privacy_policy": "Privacy Policy",
     "terms_of_service": "Terms of Service",
-    "copyright": "© 2026 ATS Resume Optimizer",
+    "copyright": "© 2026 ATS Resume Optimizer, operated by NOH SEUNGMIN",
     "hero_title_1": "Beat the ATS.",
     "hero_title_2": "Land the Interview."
   },
@@ -39,6 +39,12 @@
     "resume_type_error": "PDF files only.",
     "analyze_button": "Analyze Resume",
     "analyzing": "Analyzing...",
+    "loading_msg_1": "Reading your resume carefully...",
+    "loading_msg_2": "Extracting key keywords from the job posting...",
+    "loading_msg_3": "Calculating your ATS match score...",
+    "loading_msg_4": "Finding improvement points for each section...",
+    "loading_msg_5": "Writing your optimized resume...",
+    "loading_msg_6": "Almost done! Wrapping up...",
     "login_required_title": "Sign in to continue",
     "login_required_desc": "Create a free account to get your analysis results.",
     "login_with_google": "Continue with Google",
@@ -129,7 +135,11 @@
     "faq_2_q": "How accurate is the match score?",
     "faq_2_a": "Our AI analyzes keyword matching, experience relevance, format compatibility, and tone — giving you a comprehensive score that closely mirrors what real ATS systems evaluate.",
     "faq_3_q": "Do credits expire?",
-    "faq_3_a": "Basic and Pro credits never expire — use them whenever you need. Only the Unlimited plan has a 90-day access window."
+    "faq_3_a": "Basic and Pro credits never expire — use them whenever you need. Only the Unlimited plan has a 90-day access window.",
+    "faq_4_q": "Is my resume safe? Who can see it?",
+    "faq_4_a": "Your resume text is sent to OpenAI's API solely to generate your analysis. OpenAI does not use API inputs to train their models and deletes data within 30 days. Your analysis results are stored in our database to power your history dashboard. We never sell or share your personal data with third parties. You can request deletion of your account data at any time by contacting us.",
+    "faq_5_q": "What is your refund policy?",
+    "faq_5_a": "Credits are digital goods delivered instantly, so we do not offer refunds once credits have been used. If a technical error on our end prevented the service from working, contact us within 7 days and we will make it right."
   },
   "dashboard": {
     "title": "Dashboard",
@@ -156,5 +166,16 @@
     "generic": "Something went wrong. Please try again.",
     "api_error": "AI service temporarily unavailable. Please try again in a moment.",
     "auth_error": "Authentication failed. Please sign in again."
+  },
+  "legal": {
+    "privacy_title": "Privacy Policy",
+    "terms_title": "Terms of Service",
+    "last_updated": "Last updated: {date}",
+    "english_governs": "This page is provided in multiple languages for convenience. In the event of any conflict, the English version shall prevail."
+  },
+  "cookie": {
+    "notice": "We use essential cookies only to keep you signed in. Your resume is processed by AI to provide the service.",
+    "privacy_link": "Privacy Policy",
+    "dismiss": "Got it"
   }
 }

@@ -25,7 +25,7 @@
     "pricing_pro_features": "Escaneos ilimitados,Retroalimentación completa,CV optimizado (.docx),Historial de análisis",
     "privacy_policy": "Política de privacidad",
     "terms_of_service": "Términos de servicio",
-    "copyright": "© 2026 Optimizador ATS de CV",
+    "copyright": "© 2026 ATS Resume Optimizer, operated by NOH SEUNGMIN",
     "hero_title_1": "Supera el ATS.",
     "hero_title_2": "Consigue la entrevista."
   },
@@ -39,6 +39,12 @@
     "resume_type_error": "Solo se permiten archivos PDF.",
     "analyze_button": "Analizar CV",
     "analyzing": "Analizando...",
+    "loading_msg_1": "Leyendo tu CV detenidamente...",
+    "loading_msg_2": "Extrayendo palabras clave de la oferta...",
+    "loading_msg_3": "Calculando tu puntuación ATS...",
+    "loading_msg_4": "Buscando puntos de mejora en cada sección...",
+    "loading_msg_5": "Escribiendo tu CV optimizado...",
+    "loading_msg_6": "¡Casi listo! Finalizando...",
     "login_required_title": "Inicia sesión para continuar",
     "login_required_desc": "Crea una cuenta gratuita para ver tus resultados.",
     "login_with_google": "Continuar con Google",
@@ -129,7 +135,11 @@
     "faq_2_q": "¿Qué tan precisa es la puntuación?",
     "faq_2_a": "Nuestra IA analiza coincidencia de palabras clave, relevancia de experiencia, compatibilidad de formato y tono, dando una puntuación integral que refleja lo que evalúan los sistemas ATS reales.",
     "faq_3_q": "¿Los créditos caducan?",
-    "faq_3_a": "Los créditos Basic y Pro nunca caducan. Solo el plan Unlimited tiene una ventana de acceso de 90 días."
+    "faq_3_a": "Los créditos Basic y Pro nunca caducan. Solo el plan Unlimited tiene una ventana de acceso de 90 días.",
+    "faq_4_q": "¿Está seguro mi currículum? ¿Quién puede verlo?",
+    "faq_4_a": "El texto de tu currículum se envía únicamente a la API de OpenAI para generar el análisis. OpenAI no utiliza las entradas de la API para entrenar sus modelos y elimina los datos en un máximo de 30 días. Los resultados del análisis se almacenan en nuestra base de datos para el historial. Nunca vendemos ni compartimos tus datos personales con terceros. Puedes solicitar la eliminación de tus datos en cualquier momento.",
+    "faq_5_q": "¿Cuál es la política de reembolso?",
+    "faq_5_a": "Los créditos son bienes digitales entregados de forma instantánea, por lo que no ofrecemos reembolsos una vez utilizados. Si un error técnico de nuestra parte impidió el funcionamiento del servicio, contáctanos en los 7 días siguientes y lo resolveremos."
   },
   "dashboard": {
     "title": "Panel",
@@ -156,5 +166,16 @@
     "generic": "Algo salió mal. Por favor, inténtalo de nuevo.",
     "api_error": "Servicio de IA temporalmente no disponible. Por favor, inténtalo en un momento.",
     "auth_error": "Error de autenticación. Por favor, inicia sesión de nuevo."
+  },
+  "legal": {
+    "privacy_title": "Política de Privacidad",
+    "terms_title": "Términos de Servicio",
+    "last_updated": "Última actualización: {date}",
+    "english_governs": "Los títulos de sección se proporcionan en español por conveniencia. El contenido completo está en inglés, que es la versión con validez legal."
+  },
+  "cookie": {
+    "notice": "Usamos solo las cookies esenciales para mantener tu sesión iniciada. Tu currículum es procesado por IA para proporcionar el servicio.",
+    "privacy_link": "Política de privacidad",
+    "dismiss": "Entendido"
   }
 }

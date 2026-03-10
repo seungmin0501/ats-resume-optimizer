@@ -95,7 +95,7 @@ export default async function LandingPage({
           <span className="block">{t("hero_title_1")}</span>
           <span className="block">{t("hero_title_2")}</span>
         </h1>
-        <p className="text-xl text-gray-500 mb-10 max-w-2xl mx-auto">
+        <p className="text-xl text-gray-500 mb-10 lg:whitespace-nowrap">
           {t("hero_sub")}
         </p>
         <Link
@@ -107,7 +107,6 @@ export default async function LandingPage({
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
           </svg>
         </Link>
-        <p className="mt-4 text-sm text-gray-400">{t("trusted_by")}</p>
       </section>
 
       {/* How It Works */}
@@ -138,67 +137,111 @@ export default async function LandingPage({
       {/* Pricing */}
       <section className="bg-white border-t border-gray-200 py-24">
         <div className="max-w-5xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-4">
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-3">
             {t("pricing_title")}
           </h2>
           <p className="text-center text-gray-500 mb-12">{tPricing("subtitle")}</p>
-          {/* 플랜 요약 테이블 */}
-          <div className="overflow-x-auto mb-10">
-            <table className="w-full text-sm text-center">
-              <thead>
-                <tr className="border-b border-gray-200">
-                  <th className="text-left py-3 pr-4 font-medium text-gray-500 w-40"></th>
-                  <th className="py-3 px-4 font-semibold text-gray-700">Free</th>
-                  <th className="py-3 px-4 font-semibold text-gray-700">Basic<br /><span className="font-normal text-gray-400 text-xs">$5</span></th>
-                  <th className="py-3 px-4 font-semibold text-blue-600">Pro<br /><span className="font-normal text-blue-400 text-xs">$15</span></th>
-                  <th className="py-3 px-4 font-semibold text-purple-600">Unlimited<br /><span className="font-normal text-purple-400 text-xs">$29</span></th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                <tr>
-                  <td className="text-left py-3 pr-4 text-gray-600">{tPricing("feature_score")}</td>
-                  <td><CheckIcon /></td><td><CheckIcon /></td><td><CheckIcon /></td><td><CheckIcon /></td>
-                </tr>
-                <tr>
-                  <td className="text-left py-3 pr-4 text-gray-600">{tPricing("feature_feedback_basic")}</td>
-                  <td><XIcon /></td><td><CheckIcon /></td><td><CheckIcon /></td><td><CheckIcon /></td>
-                </tr>
-                <tr>
-                  <td className="text-left py-3 pr-4 text-gray-600">{tPricing("feature_docx")}</td>
-                  <td><XIcon /></td><td><CheckIcon /></td><td><CheckIcon /></td><td><CheckIcon /></td>
-                </tr>
-                <tr>
-                  <td className="text-left py-3 pr-4 text-gray-600">{tPricing("feature_cover_letter")}</td>
-                  <td><XIcon /></td><td><XIcon /></td><td><CheckIcon /></td><td><CheckIcon /></td>
-                </tr>
-                <tr>
-                  <td className="text-left py-3 pr-4 text-gray-600">Scans</td>
-                  <td className="text-gray-500">1</td>
-                  <td className="text-gray-700">3</td>
-                  <td className="text-blue-600 font-medium">10</td>
-                  <td className="text-purple-600 font-medium">∞ 90d</td>
-                </tr>
-              </tbody>
-            </table>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+            {/* Free */}
+            <div className="rounded-2xl border border-gray-200 bg-gray-50 p-6 flex flex-col">
+              <p className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Free</p>
+              <div className="flex items-baseline gap-1 mb-1">
+                <span className="text-4xl font-bold text-gray-900">$0</span>
+              </div>
+              <p className="text-sm text-gray-400 mb-6">1 scan</p>
+              <ul className="space-y-3 flex-1 text-sm">
+                <li className="flex items-center gap-2 text-gray-700"><CheckIcon />{tPricing("feature_score")}</li>
+                <li className="flex items-center gap-2 text-gray-400"><XIcon />{tPricing("feature_feedback_basic")}</li>
+                <li className="flex items-center gap-2 text-gray-400"><XIcon />{tPricing("feature_docx")}</li>
+                <li className="flex items-center gap-2 text-gray-400"><XIcon />{tPricing("feature_cover_letter")}</li>
+              </ul>
+              <Link href="/analyze" className="mt-6 block text-center rounded-xl border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 font-semibold py-2.5 text-sm transition-colors">
+                {tPricing("cta_free")}
+              </Link>
+            </div>
+
+            {/* Basic */}
+            <div className="rounded-2xl border border-gray-200 bg-white p-6 flex flex-col">
+              <p className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Basic</p>
+              <div className="flex items-baseline gap-1 mb-1">
+                <span className="text-4xl font-bold text-gray-900">$5</span>
+              </div>
+              <p className="text-sm text-gray-400 mb-6">3 scans · {tPricing("one_time")}</p>
+              <ul className="space-y-3 flex-1 text-sm">
+                <li className="flex items-center gap-2 text-gray-700"><CheckIcon />{tPricing("feature_score")}</li>
+                <li className="flex items-center gap-2 text-gray-700"><CheckIcon />{tPricing("feature_feedback_basic")}</li>
+                <li className="flex items-center gap-2 text-gray-700"><CheckIcon />{tPricing("feature_docx")}</li>
+                <li className="flex items-center gap-2 text-gray-400"><XIcon />{tPricing("feature_cover_letter")}</li>
+              </ul>
+              <a href="/api/checkout?plan=basic" className="mt-6 block text-center rounded-xl border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 font-semibold py-2.5 text-sm transition-colors">
+                {tPricing("cta_basic")}
+              </a>
+            </div>
+
+            {/* Pro — Most Popular */}
+            <div className="rounded-2xl border-2 border-blue-500 bg-white p-6 flex flex-col relative shadow-lg shadow-blue-100">
+              <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">
+                {tPricing("most_popular")}
+              </span>
+              <p className="text-sm font-semibold text-blue-600 uppercase tracking-wide mb-3">Pro</p>
+              <div className="flex items-baseline gap-1 mb-1">
+                <span className="text-4xl font-bold text-gray-900">$15</span>
+              </div>
+              <p className="text-sm text-gray-400 mb-6">10 scans · {tPricing("one_time")}</p>
+              <ul className="space-y-3 flex-1 text-sm">
+                <li className="flex items-center gap-2 text-gray-700"><CheckIcon />{tPricing("feature_score")}</li>
+                <li className="flex items-center gap-2 text-gray-700"><CheckIcon />{tPricing("feature_feedback_basic")}</li>
+                <li className="flex items-center gap-2 text-gray-700"><CheckIcon />{tPricing("feature_docx")}</li>
+                <li className="flex items-center gap-2 text-gray-700"><CheckIcon />{tPricing("feature_cover_letter")}</li>
+              </ul>
+              <a href="/api/checkout?plan=pro" className="mt-6 block text-center rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 text-sm transition-colors">
+                {tPricing("cta_pro")}
+              </a>
+            </div>
+
+            {/* Unlimited */}
+            <div className="rounded-2xl border border-purple-200 bg-purple-50 p-6 flex flex-col">
+              <p className="text-sm font-semibold text-purple-500 uppercase tracking-wide mb-3">Unlimited</p>
+              <div className="flex items-baseline gap-1 mb-1">
+                <span className="text-4xl font-bold text-gray-900">$29</span>
+              </div>
+              <p className="text-sm text-purple-400 mb-6">90 days · {tPricing("one_time")}</p>
+              <ul className="space-y-3 flex-1 text-sm">
+                <li className="flex items-center gap-2 text-gray-700"><CheckIcon />{tPricing("feature_score")}</li>
+                <li className="flex items-center gap-2 text-gray-700"><CheckIcon />{tPricing("feature_feedback_basic")}</li>
+                <li className="flex items-center gap-2 text-gray-700"><CheckIcon />{tPricing("feature_docx")}</li>
+                <li className="flex items-center gap-2 text-gray-700"><CheckIcon />{tPricing("feature_cover_letter")}</li>
+              </ul>
+              <a href="/api/checkout?plan=unlimited" className="mt-6 block text-center rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2.5 text-sm transition-colors">
+                {tPricing("cta_unlimited")}
+              </a>
+            </div>
           </div>
-          <div className="flex justify-center">
-            <Link
-              href="/pricing"
-              className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-8 py-3.5 font-semibold transition-colors shadow-lg shadow-blue-100"
-            >
-              {t("pricing_cta")}
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
-            </Link>
-          </div>
-          <p className="text-center text-sm text-gray-400 mt-4">{tPricing("no_subscription")}</p>
+
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-200 bg-white py-8">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
+      {/* FAQ + Footer */}
+      <footer className="border-t border-gray-200 bg-white">
+        <div className="max-w-2xl mx-auto px-4 py-16">
+          <h3 className="text-xl font-bold text-gray-900 mb-8 text-center">{tPricing("faq_title")}</h3>
+          <div className="space-y-6">
+            {[
+              { q: tPricing("faq_1_q"), a: tPricing("faq_1_a") },
+              { q: tPricing("faq_2_q"), a: tPricing("faq_2_a") },
+              { q: tPricing("faq_3_q"), a: tPricing("faq_3_a") },
+              { q: tPricing("faq_4_q"), a: tPricing("faq_4_a") },
+              { q: tPricing("faq_5_q"), a: tPricing("faq_5_a") },
+            ].map(({ q, a }) => (
+              <div key={q} className="border-b border-gray-100 pb-6">
+                <h4 className="font-semibold text-gray-900 mb-2">{q}</h4>
+                <p className="text-gray-500 text-sm leading-relaxed">{a}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="border-t border-gray-100 max-w-7xl mx-auto px-4 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
           <span>{t("copyright")}</span>
           <div className="flex items-center gap-6">
             <Link href="/privacy" className="hover:text-gray-700">{t("privacy_policy")}</Link>

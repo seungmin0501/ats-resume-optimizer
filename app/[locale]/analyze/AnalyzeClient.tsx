@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import JobInput from "@/components/JobInput";
@@ -87,6 +87,37 @@ export default function AnalyzeClient({ user }: Props) {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showCreditModal, setShowCreditModal] = useState(false);
   const [upgradeTarget, setUpgradeTarget] = useState<UpgradeTarget>(null);
+  const [loadingMsgIndex, setLoadingMsgIndex] = useState(0);
+  const loadingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const LOADING_MSGS = [
+    t("loading_msg_1"),
+    t("loading_msg_2"),
+    t("loading_msg_3"),
+    t("loading_msg_4"),
+    t("loading_msg_5"),
+    t("loading_msg_6"),
+  ];
+
+  useEffect(() => {
+    if (analyzing) {
+      setLoadingMsgIndex(0);
+      loadingIntervalRef.current = setInterval(() => {
+        setLoadingMsgIndex((prev) => Math.min(prev + 1, LOADING_MSGS.length - 1));
+      }, 5000);
+    } else {
+      if (loadingIntervalRef.current) {
+        clearInterval(loadingIntervalRef.current);
+        loadingIntervalRef.current = null;
+      }
+    }
+    return () => {
+      if (loadingIntervalRef.current) {
+        clearInterval(loadingIntervalRef.current);
+      }
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [analyzing]);
 
   const canAnalyze = jobText.trim().length > 0 && resumeFile !== null;
 
@@ -246,6 +277,11 @@ export default function AnalyzeClient({ user }: Props) {
                 </span>
               ) : t("analyze_button")}
             </button>
+            {analyzing && (
+              <p key={loadingMsgIndex} className="text-sm text-gray-500 text-center animate-pulse">
+                {LOADING_MSGS[loadingMsgIndex]}
+              </p>
+            )}
             {error && <p className="text-sm text-red-600 text-center">{error}</p>}
           </div>
 

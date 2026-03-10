@@ -25,7 +25,7 @@
     "pricing_pro_features": "10次扫描,完整章节反馈,优化简历(.docx),求职信,面试准备",
     "privacy_policy": "隐私政策",
     "terms_of_service": "服务条款",
-    "copyright": "© 2026 ATS简历优化器",
+    "copyright": "© 2026 ATS Resume Optimizer, operated by NOH SEUNGMIN",
     "hero_title_1": "通过ATS筛选。",
     "hero_title_2": "获得面试机会。"
   },
@@ -39,6 +39,12 @@
     "resume_type_error": "仅支持PDF文件。",
     "analyze_button": "分析简历",
     "analyzing": "分析中...",
+    "loading_msg_1": "正在仔细阅读您的简历...",
+    "loading_msg_2": "正在提取职位关键词...",
+    "loading_msg_3": "正在计算ATS匹配分数...",
+    "loading_msg_4": "正在查找各板块的改进点...",
+    "loading_msg_5": "正在撰写优化简历...",
+    "loading_msg_6": "快完成了！正在收尾...",
     "login_required_title": "请登录后继续",
     "login_required_desc": "创建免费账户以查看分析结果。",
     "login_with_google": "使用Google继续",
@@ -129,7 +135,11 @@
     "faq_2_q": "匹配评分有多准确？",
     "faq_2_a": "我们的AI分析关键词匹配、经验相关性、格式兼容性和语气，提供与真实ATS系统高度一致的综合评分。",
     "faq_3_q": "可以随时购买吗？",
-    "faq_3_a": "是的。我们采用一次性付费模式，无需订阅。购买后积分永不过期（无限制版除外，有效期90天）。"
+    "faq_3_a": "是的。我们采用一次性付费模式，无需订阅。购买后积分永不过期（无限制版除外，有效期90天）。",
+    "faq_4_q": "我的简历安全吗？谁可以看到它？",
+    "faq_4_a": "您的简历文本仅发送至OpenAI API以生成分析结果。OpenAI不会将API输入用于模型训练，并在最多30天内删除数据。分析结果存储在我们的数据库中以支持历史记录功能。我们绝不会向第三方出售或共享您的个人数据。您可以随时申请删除您的账户数据。",
+    "faq_5_q": "退款政策是什么？",
+    "faq_5_a": "积分是即时提供的数字商品，一旦使用后不予退款。但如果因我们的技术故障导致服务无法正常使用，请在7天内联系我们，我们将妥善处理。"
   },
   "dashboard": {
     "title": "控制台",
@@ -156,5 +166,16 @@
     "generic": "出现错误，请重试。",
     "api_error": "AI服务暂时不可用，请稍后重试。",
     "auth_error": "认证失败，请重新登录。"
+  },
+  "legal": {
+    "privacy_title": "隐私政策",
+    "terms_title": "服务条款",
+    "last_updated": "最后更新：{date}",
+    "english_governs": "章节标题以中文提供，以方便阅读。正文内容为英文，英文版本具有法律效力。"
+  },
+  "cookie": {
+    "notice": "我们仅使用必要的Cookie以保持您的登录状态。您的简历将由AI处理以提供服务。",
+    "privacy_link": "隐私政策",
+    "dismiss": "知道了"
   }
 }

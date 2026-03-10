@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { createServiceClient } from "@/lib/supabase";
 import LocaleSwitcher from "@/components/LocaleSwitcher";
+import DeleteAccountButton from "@/components/DeleteAccountButton";
 import type { PlanTier } from "@/lib/supabase";
 
 export const metadata: Metadata = {
@@ -215,6 +216,20 @@ function DashboardView({
             </div>
           )}
           <Pagination page={page} totalPages={totalPages} />
+        </div>
+
+        {/* Danger Zone */}
+        <div className="mt-12 rounded-xl border border-red-200 bg-white overflow-hidden">
+          <div className="px-6 py-4 border-b border-red-100 bg-red-50">
+            <h2 className="font-semibold text-red-800 text-sm">Danger Zone</h2>
+          </div>
+          <div className="px-6 py-5 flex items-center justify-between gap-4">
+            <div>
+              <p className="text-sm font-medium text-gray-900">Delete Account</p>
+              <p className="text-xs text-gray-500 mt-0.5">Permanently delete your account and all analysis history. This cannot be undone.</p>
+            </div>
+            <DeleteAccountButton />
+          </div>
         </div>
       </div>
     </div>
