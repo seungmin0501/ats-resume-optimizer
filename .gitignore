@@ -34,6 +34,12 @@ yarn-error.log*
 # playwright
 /test-results/
 /playwright-report/
+/e2e/
+playwright.config.ts
+
+# internal docs
+PROGRESS.md
+PAYMENT_TEST_GUIDE.md
 
 # claude code
 .claude/
