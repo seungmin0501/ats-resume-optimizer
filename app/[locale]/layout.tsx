@@ -19,9 +19,6 @@ export const metadata: Metadata = {
       "Instantly check how well your resume matches any job posting. Get a match score, missing keywords, and an AI-optimized resume. Free to start.",
     type: "website",
   },
-  verification: {
-    google: "PwDIeNJxdnkempNJE7PBx5Is8ZpKzpuGwWYbKL7iWTw",
-  },
 };
 
 export function generateStaticParams() {
@@ -46,6 +43,7 @@ export default async function LocaleLayout({
   return (
     <html lang={locale}>
       <head>
+        <meta name="google-site-verification" content="PwDIeNJxdnkempNJE7PBx5Is8ZpKzpuGwWYbKL7iWTw" />
         {/* Google Analytics */}
         <script
           async
