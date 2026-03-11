@@ -19,6 +19,9 @@ export const metadata: Metadata = {
       "Instantly check how well your resume matches any job posting. Get a match score, missing keywords, and an AI-optimized resume. Free to start.",
     type: "website",
   },
+  verification: {
+    google: "PwDIeNJxdnkempNJE7PBx5Is8ZpKzpuGwWYbKL7iWTw",
+  },
 };
 
 export function generateStaticParams() {
