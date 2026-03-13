@@ -52,7 +52,11 @@
     "resume_input_label": "CV (PDF)",
     "empty_state": "Sube tu CV y pega la oferta de trabajo para comenzar el análisis.",
     "wait_next_month": "Esperar hasta el próximo mes",
-    "feedback_locked": "Actualiza a Pro para ver este feedback en detalle. Obtén sugerencias concretas para cada sección de tu CV."
+    "feedback_locked": "Actualiza a Pro para ver este feedback en detalle. Obtén sugerencias concretas para cada sección de tu CV.",
+    "analyzing_nav_warning_title": "Análisis en Progreso",
+    "analyzing_nav_warning_desc": "Tu análisis aún está en curso. Si te vas ahora, los resultados no aparecerán aquí, pero se guardarán en tu Panel cuando finalicen.",
+    "analyzing_nav_stay": "Esperar",
+    "analyzing_nav_leave": "Salir (ver en el Panel)"
   },
   "results": {
     "match_score_label": "Puntuación de coincidencia",
@@ -172,6 +176,15 @@
     "terms_title": "Términos de Servicio",
     "last_updated": "Última actualización: {date}",
     "english_governs": "Los títulos de sección se proporcionan en español por conveniencia. El contenido completo está en inglés, que es la versión con validez legal."
+  },
+  "output_language": {
+    "label": "Idioma del currículum generado",
+    "hint": "Tu currículum optimizado, carta de presentación y preguntas de entrevista se generarán en este idioma.",
+    "en": "Inglés",
+    "ko": "Coreano",
+    "ja": "Japonés",
+    "es": "Español",
+    "zh": "Chino"
   },
   "cookie": {
     "notice": "Usamos solo las cookies esenciales para mantener tu sesión iniciada. Tu currículum es procesado por IA para proporcionar el servicio.",

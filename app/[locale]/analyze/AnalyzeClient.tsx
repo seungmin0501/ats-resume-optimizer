@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import JobInput from "@/components/JobInput";
 import UploadZone from "@/components/UploadZone";
 import ScoreGauge from "@/components/ScoreGauge";
@@ -78,8 +78,11 @@ export default function AnalyzeClient({ user }: Props) {
   const tCredits = useTranslations("credits");
   const tNav = useTranslations("nav");
   const tDash = useTranslations("dashboard");
+  const tLang = useTranslations("output_language");
+  const router = useRouter();
 
   const [jobText, setJobText] = useState("");
+  const [outputLanguage, setOutputLanguage] = useState("en");
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [result, setResult] = useState<AnalysisResponse | null>(null);
@@ -87,8 +90,10 @@ export default function AnalyzeClient({ user }: Props) {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showCreditModal, setShowCreditModal] = useState(false);
   const [upgradeTarget, setUpgradeTarget] = useState<UpgradeTarget>(null);
+  const [showNavWarning, setShowNavWarning] = useState(false);
   const [loadingMsgIndex, setLoadingMsgIndex] = useState(0);
   const loadingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const pendingNavRef = useRef<(() => void) | null>(null);
 
   const LOADING_MSGS = [
     t("loading_msg_1"),
@@ -119,6 +124,26 @@ export default function AnalyzeClient({ user }: Props) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [analyzing]);
 
+  // Warn before tab close / browser refresh during analysis
+  useEffect(() => {
+    if (!analyzing) return;
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [analyzing]);
+
+  const guardNav = useCallback((navFn: () => void) => {
+    if (analyzing) {
+      pendingNavRef.current = navFn;
+      setShowNavWarning(true);
+    } else {
+      navFn();
+    }
+  }, [analyzing]);
+
   const canAnalyze = jobText.trim().length > 0 && resumeFile !== null;
 
   const planTier = user?.planTier ?? "free";
@@ -147,6 +172,7 @@ export default function AnalyzeClient({ user }: Props) {
       const formData = new FormData();
       formData.append("job_description", jobText);
       formData.append("resume", resumeFile!);
+      formData.append("output_language", outputLanguage);
 
       const res = await fetch("/api/analyze", { method: "POST", body: formData });
       const data = await res.json();
@@ -194,9 +220,16 @@ export default function AnalyzeClient({ user }: Props) {
       {/* Navbar */}
       <nav className="border-b border-gray-200 bg-white sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-          <Link href="/" className="font-bold text-lg text-blue-600">{tNav("logo")}</Link>
+          <Link
+            href="/"
+            className="font-bold text-lg text-blue-600"
+            onClick={(e) => { if (analyzing) { e.preventDefault(); guardNav(() => router.push("/")); } }}
+          >{tNav("logo")}</Link>
           <div className="flex items-center gap-4">
-            <LocaleSwitcher />
+            {/* Disable locale switching during analysis to prevent losing results */}
+            <div className={analyzing ? "relative pointer-events-none opacity-40" : ""}>
+              <LocaleSwitcher />
+            </div>
             {user ? (
               <>
                 {creditsDisplay !== null && (
@@ -207,7 +240,11 @@ export default function AnalyzeClient({ user }: Props) {
                 <span className={`text-xs font-semibold px-2 py-0.5 rounded-full hidden sm:block ${PLAN_COLORS[planTier]}`}>
                   {PLAN_LABELS[planTier]}
                 </span>
-                <Link href="/dashboard" className="text-sm text-gray-700 hover:text-gray-900 hidden sm:block">
+                <Link
+                  href="/dashboard"
+                  className="text-sm text-gray-700 hover:text-gray-900 hidden sm:block"
+                  onClick={(e) => { if (analyzing) { e.preventDefault(); guardNav(() => router.push("/dashboard")); } }}
+                >
                   {tNav("dashboard")}
                 </Link>
                 <div className="flex items-center gap-2">
@@ -252,7 +289,26 @@ export default function AnalyzeClient({ user }: Props) {
           <div className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">{t("job_input_label")}</label>
-              <JobInput onTextReady={setJobText} />
+              <JobInput onTextReady={setJobText} onLanguageDetected={setOutputLanguage} />
+            </div>
+
+            {/* 이력서 출력 언어 선택 */}
+            <div className="rounded-xl border border-gray-200 bg-white px-4 py-3 flex flex-col gap-1.5">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-gray-700">{tLang("label")}</span>
+                <select
+                  value={outputLanguage}
+                  onChange={(e) => setOutputLanguage(e.target.value)}
+                  className="text-sm border border-gray-200 rounded-md px-2 py-1 text-gray-700 bg-white focus:outline-none focus:ring-1 focus:ring-blue-400"
+                >
+                  <option value="en">{tLang("en")}</option>
+                  <option value="ko">{tLang("ko")}</option>
+                  <option value="ja">{tLang("ja")}</option>
+                  <option value="es">{tLang("es")}</option>
+                  <option value="zh">{tLang("zh")}</option>
+                </select>
+              </div>
+              <p className="text-xs text-gray-400">{tLang("hint")}</p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">{t("resume_input_label")}</label>
@@ -376,6 +432,29 @@ export default function AnalyzeClient({ user }: Props) {
           </div>
         </div>
       </div>
+
+      {/* Nav Warning Modal — shown when user tries to navigate away during analysis */}
+      {showNavWarning && (
+        <Modal onClose={() => setShowNavWarning(false)}>
+          <div className="text-center">
+            <div className="text-4xl mb-4">⏳</div>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">{t("analyzing_nav_warning_title")}</h2>
+            <p className="text-gray-500 text-sm mb-6">{t("analyzing_nav_warning_desc")}</p>
+            <button
+              onClick={() => setShowNavWarning(false)}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg py-3 font-semibold transition-colors mb-3"
+            >
+              {t("analyzing_nav_stay")}
+            </button>
+            <button
+              onClick={() => { setShowNavWarning(false); pendingNavRef.current?.(); }}
+              className="w-full text-sm text-gray-400 hover:text-gray-600"
+            >
+              {t("analyzing_nav_leave")}
+            </button>
+          </div>
+        </Modal>
+      )}
 
       {/* Login Modal */}
       {showLoginModal && (

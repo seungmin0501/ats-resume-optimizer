@@ -52,7 +52,11 @@
     "resume_input_label": "履歴書（PDF）",
     "empty_state": "履歴書をアップロードして求人情報を貼り付けると分析が始まります。",
     "wait_next_month": "来月まで待つ",
-    "feedback_locked": "Proにアップグレードして詳細なフィードバックを確認しましょう。履歴書の各セクションについて具体的な改善提案を受けられます。"
+    "feedback_locked": "Proにアップグレードして詳細なフィードバックを確認しましょう。履歴書の各セクションについて具体的な改善提案を受けられます。",
+    "analyzing_nav_warning_title": "分析中です",
+    "analyzing_nav_warning_desc": "分析はまだ実行中です。ページを離れると結果はここに表示されませんが、完了後にダッシュボードで確認できます。",
+    "analyzing_nav_stay": "待機する",
+    "analyzing_nav_leave": "離れる（ダッシュボードで確認）"
   },
   "results": {
     "match_score_label": "マッチスコア",
@@ -172,6 +176,15 @@
     "terms_title": "利用規約",
     "last_updated": "最終更新日: {date}",
     "english_governs": "セクションタイトルは便宜上、日本語で提供されています。本文は英語で記載されており、英語版が法的効力を持ちます。"
+  },
+  "output_language": {
+    "label": "生成される履歴書の言語",
+    "hint": "最適化された履歴書・カバーレター・面接Q&Aが選択した言語で生成されます。",
+    "en": "英語",
+    "ko": "韓国語",
+    "ja": "日本語",
+    "es": "スペイン語",
+    "zh": "中国語"
   },
   "cookie": {
     "notice": "ログイン状態を維持するための必要なCookieのみを使用しています。履歴書はサービス提供のためにAIで処理されます。",

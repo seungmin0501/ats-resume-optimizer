@@ -52,7 +52,11 @@
     "resume_input_label": "简历（PDF）",
     "empty_state": "上传简历并粘贴职位信息即可开始分析。",
     "wait_next_month": "等到下个月",
-    "feedback_locked": "升级到Basic即可查看简历各章节的详细反馈。"
+    "feedback_locked": "升级到Basic即可查看简历各章节的详细反馈。",
+    "analyzing_nav_warning_title": "分析进行中",
+    "analyzing_nav_warning_desc": "您的分析仍在运行中。现在离开结果将不会显示在此处，但完成后可在仪表板中查看。",
+    "analyzing_nav_stay": "继续等待",
+    "analyzing_nav_leave": "离开（在仪表板查看）"
   },
   "results": {
     "match_score_label": "匹配评分",
@@ -172,6 +176,15 @@
     "terms_title": "服务条款",
     "last_updated": "最后更新：{date}",
     "english_governs": "章节标题以中文提供，以方便阅读。正文内容为英文，英文版本具有法律效力。"
+  },
+  "output_language": {
+    "label": "生成简历的语言",
+    "hint": "优化后的简历、求职信和面试问答将以所选语言生成。",
+    "en": "英语",
+    "ko": "韩语",
+    "ja": "日语",
+    "es": "西班牙语",
+    "zh": "中文"
   },
   "cookie": {
     "notice": "我们仅使用必要的Cookie以保持您的登录状态。您的简历将由AI处理以提供服务。",

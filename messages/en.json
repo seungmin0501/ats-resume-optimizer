@@ -52,7 +52,11 @@
     "resume_input_label": "Resume (PDF)",
     "empty_state": "Upload your resume and paste a job posting to get started.",
     "wait_next_month": "Wait until next month",
-    "feedback_locked": "Upgrade to Pro to see this feedback in detail. Get actionable suggestions for every section of your resume."
+    "feedback_locked": "Upgrade to Pro to see this feedback in detail. Get actionable suggestions for every section of your resume.",
+    "analyzing_nav_warning_title": "Analysis in Progress",
+    "analyzing_nav_warning_desc": "Your analysis is still running. If you leave now, results won't appear here — but will be saved to your Dashboard when complete.",
+    "analyzing_nav_stay": "Stay & Wait",
+    "analyzing_nav_leave": "Leave (check Dashboard later)"
   },
   "results": {
     "match_score_label": "Match Score",
@@ -172,6 +176,15 @@
     "terms_title": "Terms of Service",
     "last_updated": "Last updated: {date}",
     "english_governs": "This page is provided in multiple languages for convenience. In the event of any conflict, the English version shall prevail."
+  },
+  "output_language": {
+    "label": "Output Resume Language",
+    "hint": "Your optimized resume, cover letter, and interview Q&A will be generated in this language.",
+    "en": "English",
+    "ko": "Korean",
+    "ja": "Japanese",
+    "es": "Spanish",
+    "zh": "Chinese"
   },
   "cookie": {
     "notice": "We use essential cookies only to keep you signed in. Your resume is processed by AI to provide the service.",
